@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Color theme for statusbar -->
+    <meta name="theme-color" content="#2196f3">
+    <!-- Your app title -->
+    <title>Travel Guide</title>
+    <!-- Path to Framework7 Library CSS, Material Theme -->
+    <link rel="stylesheet" href="css/framework7.min.css">
+    <!-- Path to your custom app styles-->
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body class="color-theme-orange">
+<!-- App root element -->
+<div id="app">
+    <!-- Statusbar overlay -->
+    <div class="statusbar"></div>
+
+    <div class="panel panel-left panel-cover">
+        ... panel content goes here ...
+    </div>
+
+    <!-- Your main view, should have "view-main" class -->
+    <div class="view view-main">
+        <!-- Initial Page, "data-name" contains page name -->
+        <div data-name="home" class="page">
+            <div class="navbar">
+                <div class="navbar-inner">
+                    <div class="left">
+                        <a href="#" class="link icon-only panel-open">
+                            <i class="material-icons">menu</i>
+                        </a>
+                    </div>
+                    <div class="title">Ταξιδιωτικός Οδηγός Σύρου</div>
+                </div>
+            </div>
+
+            <!-- Toolbar
+            <div class="toolbar">
+                <div class="toolbar-inner">
+                    <a href="#" class="link">Link 1</a>
+                    <a href="#" class="link">Link 2</a>
+                </div>
+            </div>-->
+
+            <div class="page-content">
+                <div class="block-title">Μικρός ταξιδιωτικός οδηγός Σύρου</div>
+                <div class="block block-strong">
+                    <p>Καλώς ήρθατε στον μικρό τακιδιωτικό οδηγό της Σύρου</p>
+                    <p>Βρείτε πληροφορίες για τους οικισμούς, τα αξιοθέατα, τις παραλίες του νησιού</p>
+
+                    <!-- Link to another page -->
+                    <a href="/about/">About app</a>
+                </div>
+
+                <div class="block-title">Επιλέξτε:</div>
+                <div class="list media-list ">
+                    <ul>
+                        <li>
+                            <a href="/places/" class="item-link item-content">
+                                <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">Πληροφορίες</div>
+                                    </div>
+                                    <div class="item-subtitle">Γενικές πληροφορίες για το Νησί</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/places/" class="item-link item-content">
+                            <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                            <div class="item-inner">
+                                <div class="item-title-row">
+                                    <div class="item-title">Οικισμοί</div>
+                                </div>
+                                <div class="item-subtitle">Οι οικισμοί του νησιού</div>
+                            </div>
+                        </a>
+                        </li>
+                        <li>
+                            <a href="/sights/" class="item-link item-content">
+                                <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">Αξιοθέτα</div>
+                                    </div>
+                                    <div class="item-subtitle">Περιηγηθείτε στα αξιοθέατα του νησιού</div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/beaches/" class="item-link item-content">
+                                <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">Παραλίες</div>
+                                    </div>
+                                    <div class="item-subtitle">Όμορφες παραλίες στο νησί</div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Path to Framework7 Library JS-->
+<script type="text/javascript" src="lib/framework7.min.js"></script>
+<!-- Path to your app js-->
+<script type="text/javascript" src="js/app.js"></script>
+</body>
+</html>
