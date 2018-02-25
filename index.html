@@ -156,6 +156,40 @@
         </div>
     </div>
 </div>
+<!-- Templates -->
+<script id="beaches-template" type="text/template7">
+    {{#each data}}
+    <li>
+    <a href="/details/" class="item-link item-content">
+        <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+        <div class="item-inner">
+        <div class="item-title-row">
+        <div class="item-title">{{title}}</div>
+        </div>
+        <div class="item-subtitle">{{intro}}</div>
+    </div>
+    </a>
+    </li>
+    {{/each}}
+</script>
+
+<script id="list-template" type="text/template7">
+    {{#each data}}
+    <li>
+        <a href="/details/" class="item-link item-content">
+            <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-title">{{title}}</div>
+                </div>
+                <div class="item-subtitle">{{intro}}</div>
+            </div>
+        </a>
+    </li>
+    {{/each}}
+</script>
+
+
 <!-- Path to Framework7 Library JS-->
 <script type="text/javascript" src="lib/framework7.min.js"></script>
 <!-- Libraries -->
