@@ -16,8 +16,8 @@ var app = new Framework7({
     // Add default routes
     routes: [
         {
-            path: '/about/',
-            url: 'pages/about.html'
+            path: '/about/:user/',
+            url: './pages/about.html'
         },
         {
             path: '/places/',
@@ -53,6 +53,8 @@ log.setLevel(settings.mode);
 
 var appData = {};
 
+
+// Initialize deviceData with fake data in case the app run from browser (Debugging mode)
 var deviceData = {
     cordova: "web",
     model: "web",
@@ -83,6 +85,7 @@ function onDeviceReady() {
     checkApp();
 }
 
+
 function onPause() {
     // Handle the pause event
 }
@@ -101,12 +104,14 @@ var compiledBeachesTemplate = Template7.compile(beachesTemplate);
 var listTemplate = $$('script#list-template').html();
 var compiledListTemplate = Template7.compile(listTemplate);
 
-//initilize the app
+//initilize the app - check if app run for first time
 function checkApp() {
     log.debug('Inside checkApp');
     if (localStorage.appData) {
+        log.debug('localstorage have data');
         appData = JSON.parse(localStorage.getItem('appData'));
         if (appData.version !== app.version) {
+            log.debug('The api version is different');
             initApp(false); // re-init app because different version found
         }
     } else {
@@ -114,13 +119,6 @@ function checkApp() {
         initApp(true);
     }
 
-    //TODO delete this
-    registerDevice();
-    if (localStorage.deviceData) {
-        deviceData = JSON.parse(localStorage.getItem('deviceData'));
-    } else {
-        localStorage.setItem('deviceData', JSON.stringify(deviceData));
-    }
 }
 
 function initApp(firstTime) {
@@ -129,7 +127,9 @@ function initApp(firstTime) {
     appData.id = app.id;
     appData.version = app.version;
 
+    // if app run for first time create a guid and register device
     if (firstTime) {
+        log.debug('Init app for first time');
         appData.guid = createGuid();
         appData.authHeader = "Basic " + btoa(appData.guid);
         registerDevice();
@@ -218,9 +218,13 @@ $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
 $$(document).on('page:init', '.page[data-name="about"]', function (e) {
     log.debug("about...");
 
-    navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
+    var page = e.detail;
+    //navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
 
-    putDeviceData();
+    //putDeviceData();
+
+    log.debug(page.route.params);
+    log.debug(page.router.currentRoute);
 
 
 });
@@ -300,6 +304,7 @@ function checkConnection() {
 
 
 function registerDevice() {
+    log.debug('Register the device');
     //var url = settings.baseUrl + 'register';
     var url = settings.baseUrl + 'register';
    // var authHeader = 'Basic ' + btoa(app.guid);
