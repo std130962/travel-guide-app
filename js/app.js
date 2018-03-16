@@ -267,6 +267,7 @@ function setDeviceData() {
 
 }
 
+
 function putDeviceData() {
 
     $$('#device-cordova').text(deviceData.cordova);
@@ -300,15 +301,20 @@ function checkConnection() {
 
 function registerDevice() {
     //var url = settings.baseUrl + 'register';
-    var url = "http://localhost/travel-guide/travel-guide-api/public/index.php/register";
+    var url = settings.baseUrl + 'register';
    // var authHeader = 'Basic ' + btoa(app.guid);
+    var data = {
+        guid: appData.guid,
+        cordova: deviceData.cordova,
+        model: deviceData.model,
+        platform: deviceData.platform,
+        manufacturer: deviceData.manufacturer,
+        isvirtual: deviceData.isVirtual
+    };
     axios({
         method: 'post',
         url: url,
-        data: {
-            firstName: 'Fred',
-            lastName: 'Flintstone'
-        },
+        data: data,
         headers: {
             'Authorization': appData.authHeader
         }
