@@ -36,6 +36,7 @@
 }
 
 /* Rules for sizing the icon. */
+.material-icons.md-8 { font-size: 8px; }
 .material-icons.md-18 { font-size: 18px; }
 .material-icons.md-24 { font-size: 24px; }
 .material-icons.md-36 { font-size: 36px; }
@@ -45,23 +46,29 @@
 .material-icons.md-dark { color: rgba(0, 0, 0, 0.54); }
 .material-icons.md-dark.md-inactive { color: rgba(0, 0, 0, 0.26); }
 
+.material-icons.orange600 { color: #FB8C00; }
+
 /* Swiper */
 .demo-swiper .swiper-slide {
+
+    background-size: cover;
     font-size: 25px;
     font-weight: 300;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #fff;
+    /*background: #fff;*/
     color: #000;
+
+
 }
 .demo-swiper .swiper-slide {
     box-sizing: border-box;
     border: 1px solid #ddd;
-    background: #fff;
+    /*background: #fff;*/
 }
 .demo-swiper {
-    margin: 0px 0 35px;
+    margin: 0px 0 0px;
     font-size: 18px;
     height: 280px;
 }
@@ -73,4 +80,18 @@
 }
 .demo-swiper.demo-swiper-auto .swiper-slide:nth-child(3n) {
     width: 30%;
+}
+
+
+.list .item-subtitle {
+    white-space: normal;
+}
+
+.row-pall-orange {
+    background-color: #fbdaa9;
+    padding: 10px;
+}
+
+.item-media img {
+    border-radius: 6px;
 }
