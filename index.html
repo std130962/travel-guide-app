@@ -22,7 +22,7 @@
 
     <!-- Left Panel -->
     <div class="panel panel-left panel-cover">
-        <div class="block-title">Links</div>
+        <div class="block-title">Menu</div>
         <div class="list">
             <ul>
                 <li>
@@ -34,8 +34,16 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/info/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark">import_contacts</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">Γενικές Πληροφορίες</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
                     <a href="/places/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark">map</i></div>
+                        <div class="item-media"><i class="material-icons md-dark">location_city</i></div>
                         <div class="item-inner">
                             <div class="item-title">Οικισμοί</div>
                             <div class="item-after">12</div>
@@ -59,10 +67,42 @@
                     </a>
                 </li>
                 <li>
+                    <a href="/map/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark">map</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">Χάρτης</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="/favorites/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark">favorite</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">Αγαπημένα</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
                     <a href="/about/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark">beach_access</i></div>
+                        <div class="item-media"><i class="material-icons md-dark">info</i></div>
                         <div class="item-inner">
                             <div class="item-title">Περί...</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="/details-demo/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark">demo</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">Περί...</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="/details-template/2/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark">demo</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">template...</div>
                         </div>
                     </a>
                 </li>
@@ -96,19 +136,19 @@
             <div class="page-content">
                 <div class="block-title">Μικρός ταξιδιωτικός οδηγός Σύρου</div>
                 <div class="block block-strong">
-                    <p>Καλώς ήρθατε στον μικρό τακιδιωτικό οδηγό της Σύρου</p>
+                    <p>Καλώς ήρθατε στον μικρό ταξιδιωτικό οδηγό της Σύρου</p>
                     <p>Βρείτε πληροφορίες για τους οικισμούς, τα αξιοθέατα, τις παραλίες του νησιού</p>
 
                     <!-- Link to another page -->
-                    <a href="/about/">About app</a>
+                    <a href="/about/12/">About app</a>
                 </div>
 
                 <div class="block-title">Επιλέξτε:</div>
                 <div class="list media-list ">
                     <ul>
                         <li>
-                            <a href="/places/" class="item-link item-content">
-                                <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+                            <a href="/info/" class="item-link item-content">
+                                <div class="item-media"><img src="images/thumbs/info.jpg" width="74"/></div>
                                 <div class="item-inner">
                                     <div class="item-title-row">
                                         <div class="item-title">Πληροφορίες</div>
@@ -119,7 +159,7 @@
                         </li>
                         <li>
                             <a href="/places/" class="item-link item-content">
-                            <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                            <div class="item-media"><img src="images/thumbs/places.jpg" width="74"/></div>
                             <div class="item-inner">
                                 <div class="item-title-row">
                                     <div class="item-title">Οικισμοί</div>
@@ -130,7 +170,7 @@
                         </li>
                         <li>
                             <a href="/sights/" class="item-link item-content">
-                                <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                                <div class="item-media"><img src="images/thumbs/sights.jpg" width="74"/></div>
                                 <div class="item-inner">
                                     <div class="item-title-row">
                                         <div class="item-title">Αξιοθέτα</div>
@@ -141,7 +181,7 @@
                         </li>
                         <li>
                             <a href="/beaches/" class="item-link item-content">
-                                <div class="item-media"><img src="https://picsum.photos/100?random" width="74"/></div>
+                                <div class="item-media"><img src="images/thumbs/beaches.jpg" width="74"/></div>
                                 <div class="item-inner">
                                     <div class="item-title-row">
                                         <div class="item-title">Παραλίες</div>
@@ -152,8 +192,6 @@
                         </li>
                     </ul>
                 </div>
-
-
 
 
 
@@ -175,8 +213,29 @@
         <div class="item-title">{{title}}</div>
         </div>
         <div class="item-subtitle">{{intro}}</div>
+            <div>1500 μέτρα</div>
     </div>
     </a>
+    </li>
+    {{/each}}
+</script>
+
+<script id="info-template" type="text/template7">
+    {{#each data}}
+    <li>
+        <a href="/details-template/{{id}}/" class="item-link item-content">
+            <div class="item-media"><img src="{{thumbnail}}" width="74"/></div>
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-title">{{title}}</div>
+                </div>
+                <div class="item-subtitle">{{intro}}</div>
+                <div class="row">
+                    <div class="col-50"><small><span class="text-color-orange">{{likes}} &#10084;</span> </small></div>
+                    <div class="col-50"><small><span class="text-color-orange"></span></small></div>
+                </div>
+            </div>
+        </a>
     </li>
     {{/each}}
 </script>
@@ -184,17 +243,44 @@
 <script id="list-template" type="text/template7">
     {{#each data}}
     <li>
-        <a href="/details/" class="item-link item-content">
-            <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+        <a href="/details-template/{{id}}/" class="item-link item-content">
+            <div class="item-media"><img src="{{thumbnail}}" width="74"/></div>
             <div class="item-inner">
                 <div class="item-title-row">
                     <div class="item-title">{{title}}</div>
                 </div>
-                <div class="item-subtitle">{{intro}}</div>
+                <div class="item-subtitle">{{intro}} &nbsp;</div>
+                <div class="row">
+                    <div class="col-20"><small><span class="text-color-orange">{{likes}} &#10084;</span> </small></div>
+                    <div class="col-80"><small><span class="text-color-blue">{{distance}}</span></small></div>
+                </div>
             </div>
         </a>
     </li>
     {{/each}}
+</script>
+
+<script id="gallery-template" type="text/template7">
+    {{#each data}}
+    <div class="swiper-slide" style="background-image:url({{this}})"></div>
+    {{/each}}
+</script>
+
+<script id="details-template" type="text/template7">
+    <div class="row row-pall-orange">
+        <div class="col-20 text-color-orange">{{likes}} &#10084;</div>
+        <div class="col-40 text-color-blue">{{#if lat}} {{distance}} {{/if}}</div>
+        <div class="col-20">
+            <button class="button button-small"><i class="material-icons md-dark orange600">map</i></button>
+        </div>
+        <div class="col-20">
+            <button id="add-to-fav" class="button button-small "><i class="material-icons md-dark orange600">favorite_border</i>
+            </button>
+        </div>
+    </div>
+    <div class="block">
+        {{content}}
+    </div>
 </script>
 
 

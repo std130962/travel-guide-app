@@ -16,12 +16,16 @@ var app = new Framework7({
     // Add default routes
     routes: [
         {
-            path: '/about/:user/',
-            url: './pages/about.html'
+            path: '/info/',
+            url: 'pages/info.html'
         },
         {
             path: '/places/',
             url: 'pages/places.html'
+        },
+        {
+            path: '/sights/',
+            url: 'pages/sights.html'
         },
         {
             name: 'beaches',
@@ -29,12 +33,29 @@ var app = new Framework7({
             url: 'pages/beaches.html'
         },
         {
-            path: '/sights/',
-            url: 'pages/sights.html'
+            name: 'map',
+            path: '/map/',
+            url: 'pages/map.html'
+        },
+        {
+            path: '/favorites/',
+            url: 'pages/favorites.html'
+        },
+        {
+            path: '/about/:user/',
+            url: './pages/about.html'
         },
         {
             path: '/details/',
             url: 'pages/details.html'
+        },
+        {
+            path: '/details-demo/',
+            url: './pages/details-demo.html'
+        },
+        {
+            path: '/details-template/:id/',
+            url: './templates/details.html',
         }
     ],
 
@@ -43,7 +64,8 @@ var app = new Framework7({
 
 
 var settings = {
-    baseUrl: 'http://travel-guide-api.lrn.gr/public/index.php/',
+    baseUrl: 'http://travel-guide.lrn.gr/api/public/index.php/',
+    imagesUrl: 'http://travel-guide.lrn.gr/api/public/images/',
     // Debug mode for logging - debug, info, error
     mode: 'debug',
 
@@ -52,6 +74,10 @@ var settings = {
 log.setLevel(settings.mode);
 
 var appData = {};
+var appCoords = {
+    lat: 37.441811,
+    lng: 24.940424
+};
 
 
 // Initialize deviceData with fake data in case the app run from browser (Debugging mode)
@@ -101,8 +127,17 @@ var mainView = app.views.create('.view-main');
 var beachesTemplate = $$('script#beaches-template').html();
 var compiledBeachesTemplate = Template7.compile(beachesTemplate);
 
+var infoTemplate = $$('script#info-template').html();
+var compiledInfoTemplate = Template7.compile(infoTemplate);
+
 var listTemplate = $$('script#list-template').html();
 var compiledListTemplate = Template7.compile(listTemplate);
+
+var galleryTemplate = $$('script#gallery-template').html();
+var compiledGalleryTemplate = Template7.compile(galleryTemplate);
+
+var detailsTemplate = $$('script#details-template').html();
+var compiledDetailsTemplate = Template7.compile(detailsTemplate);
 
 //initilize the app - check if app run for first time
 function checkApp() {
@@ -143,13 +178,11 @@ $$(document).on('page:init', '.page[data-name="places"]', function (e) {
 
     url = settings.baseUrl + 'places';
     axios.get(url, {
-        params: {
-            ID: 12345
-        }
+        params: {}
     })
         .then(function (response) {
             var context = {
-                data: response.data
+                data: fixData(response.data)
             };
 
             var html = compiledListTemplate(context);
@@ -163,22 +196,40 @@ $$(document).on('page:init', '.page[data-name="places"]', function (e) {
 
 });
 
+$$(document).on('page:init', '.page[data-name="info"]', function (e) {
+    log.debug("info...");
+
+    url = settings.baseUrl + 'info';
+    axios.get(url, {})
+        .then(function (response) {
+            var context = {
+                data: fixData(response.data)
+            };
+
+            //var html = compiledBeachesTemplate(context);
+            var html = compiledInfoTemplate(context);
+
+            $$('#info-list').html(html);
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+});
+
 $$(document).on('page:init', '.page[data-name="beaches"]', function (e) {
     log.debug("beaches...");
 
     url = settings.baseUrl + 'beaches';
-    axios.get(url, {
-        params: {
-            ID: 12345
-        }
-    })
+    axios.get(url, {})
         .then(function (response) {
             var context = {
-                data: response.data
+                data: fixData(response.data)
             };
 
-            var html = compiledBeachesTemplate(context);
-            console.log(html);
+            //var html = compiledBeachesTemplate(context);
+            var html = compiledListTemplate(context);
 
             $$('#beaches-list').html(html);
 
@@ -193,24 +244,160 @@ $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
     log.debug("sights...");
 
     url = settings.baseUrl + 'sights';
-    axios.get(url, {
-        params: {
-            ID: 12345
-        }
-    })
+    axios.get(url)
         .then(function (response) {
+            var data = response.data;
             var context = {
-                data: response.data
+                data: fixData(response.data)
             };
 
             var html = compiledListTemplate(context);
-            console.log(html);
 
             $$('#sights-list').html(html);
 
         })
         .catch(function (error) {
             console.log(error);
+        });
+
+});
+
+$$(document).on('page:init', '.page[data-name="details"]', function (e) {
+    log.debug('Inside details...');
+    url = settings.baseUrl + 'items/2';
+    axios.get(url, {
+        params: {
+            ID: 12345
+        }
+    })
+        .then(function (response) {
+            log.debug(response);
+
+        })
+        .catch(function (error) {
+            log.error(error);
+        });
+});
+
+$$(document).on('page:init', '.page[data-name="details-template"]', function (e) {
+    log.debug('Inside details template...');
+    var page = e.detail;
+    var url = settings.baseUrl + 'items/' + page.route.params.id;
+
+    // Request data
+    axios.get(url, {})
+        .then(function (response) {
+            log.debug(response.data);
+
+            var context = response.data;
+
+            // set the title
+            $$('#details-title').text(context.title);
+
+            // fix the likes number
+            if (context.likes === null) {
+                context.likes = 0;
+            }
+
+            // set the distance
+            context.distance = distance(context.lat, context.lng, appCoords.lat, appCoords.lng);
+
+            var html = compiledDetailsTemplate(context);
+            $$('#details-div').html(html);
+
+            // fix data for the swiper gallery
+            if (context.gallery !== "") {
+                context.gallery = context.gallery.split(',');
+                context.gallery = context.gallery.map(function (e) {
+                    return settings.imagesUrl + e
+                });
+            } else if (context.image !== "") {
+                context.gallery = [];
+                context.gallery[0] = settings.imagesUrl + context.image;
+            } else {
+                context.gallery = [];
+                context.gallery[0] = "images/placeholder.png";
+            }
+
+            var galleryContext = {
+                data: context.gallery
+            };
+
+            log.debug(galleryContext);
+
+            var galleryhtml = compiledGalleryTemplate(galleryContext);
+            console.log(galleryhtml);
+
+            $$('#gallery-list').html(galleryhtml);
+
+            var mySwiper = app.swiper.get('#details-swiper');
+
+            mySwiper.update();
+
+
+            $$('#add-to-fav').on('click', function (e) {
+                log.debug('click...');
+                // Show toast
+                var toastBottom = app.toast.create({
+                    text: context.title + ': Προστέθηκε στα αγαπημένα.',
+                    closeTimeout: 2000,
+                });
+                toastBottom.open();
+            });
+
+
+
+
+
+        })
+        .catch(function (error) {
+            log.error(error);
+        });
+
+
+
+});
+
+$$(document).on('page:init', '.page[data-name="details-demo"]', function (e) {
+    log.debug('Inside details demo...');
+    url = settings.baseUrl + 'items/2';
+    axios.get(url, {})
+        .then(function (response) {
+            log.debug(response);
+
+            var data = response.data[0];
+
+            if (data.gallery !== "") {
+                data.gallery = data.gallery.split(',');
+                data.gallery = data.gallery.map(function (e) {
+                    return settings.imagesUrl + e
+                });
+            } else if (data.image !== "") {
+                data.gallery = [];
+                data.gallery[0] = settings.imagesUrl + data.image;
+            } else {
+                data.gallery = [];
+                data.gallery[0] = "images/placeholder.png";
+            }
+
+            var context = {
+                data: data.gallery
+            };
+
+            log.debug(context);
+
+            var html = compiledGalleryTemplate(context);
+            console.log(html);
+
+            $$('#gallery-list').html(html);
+
+            var mySwiper = app.swiper.get('#my-swiper');
+
+            mySwiper.update();
+
+        })
+        .catch(function (error) {
+            log.error(error);
         });
 
 });
@@ -307,7 +494,7 @@ function registerDevice() {
     log.debug('Register the device');
     //var url = settings.baseUrl + 'register';
     var url = settings.baseUrl + 'register';
-   // var authHeader = 'Basic ' + btoa(app.guid);
+    // var authHeader = 'Basic ' + btoa(app.guid);
     var data = {
         guid: appData.guid,
         cordova: deviceData.cordova,
@@ -332,4 +519,43 @@ function registerDevice() {
         });
 }
 
+
+function distance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;    // Math.PI / 180
+    var c = Math.cos;
+    var a = 0.5 - c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) *
+        (1 - c((lon2 - lon1) * p)) / 2;
+
+    var result = 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
+
+    if (result > 1.5) {
+        return Math.round(result * 100) / 100 + " km";
+    } else {
+        return Math.round(result * 1000) + " m";
+    }
+}
+
+function fixData(data) {
+
+    data.forEach(function (arrayItem) {
+        arrayItem.distance = distance(arrayItem.lat, arrayItem.lng, appCoords.lat, appCoords.lng);
+        if (arrayItem.likes === null) {
+            arrayItem.likes = 0;
+        }
+        if (arrayItem.thumbnail === "") {
+            arrayItem.thumbnail = "images/thumbs/placeholder.jpg"
+        } else {
+            arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
+        }
+        if (arrayItem.image === "") {
+            arrayItem.image = "images/placeholder.png"
+        } else {
+            arrayItem.image = settings.imagesUrl + arrayItem.image;
+        }
+    });
+    log.debug(data);
+
+    return data;
+}
 
