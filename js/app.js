@@ -355,16 +355,19 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
             isInFavorites(context.id, el);
             $$('#add-to-fav').on('click', function (e) {
                 log.debug('click...');
+                var infoText;
 
                 var added = addToFavorites(context);
                 if (added) {
                     $$('.fav-icon').text('favorite');
+                    infoText = ': Προστέθηκε στα αγαπημένα.';
                 } else {
                     $$('.fav-icon').text('favorite_border');
+                    infoText = ': Αφαιρέθηκε στα αγαπημένα.';
                 }
                 // Show toast
                 var toastBottom = app.toast.create({
-                    text: context.title + ': Προστέθηκε στα αγαπημένα.',
+                    text: context.title + infoText,
                     closeTimeout: 2000,
                 });
                 toastBottom.open();
@@ -425,9 +428,9 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
     log.debug("debug...");
 
     var page = e.detail;
-    //navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
+    navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
 
-    //putDeviceData();
+    putDeviceData();
 
     log.debug(page.route.params);
     log.debug(page.router.currentRoute);
