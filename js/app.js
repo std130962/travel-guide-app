@@ -35,6 +35,10 @@ var appCoords = {
     lat: 37.441811,
     lng: 24.940424
 };
+var appFavorites = {
+    favorites: [],
+    ids: []
+};
 
 
 // Initialize deviceData with fake data in case the app run from browser (Debugging mode)
@@ -99,8 +103,9 @@ var compiledDetailsTemplate = Template7.compile(detailsTemplate);
 //initilize the app - check if app run for first time
 function checkApp() {
     log.debug('Inside checkApp');
+
     if (localStorage.appData) {
-        log.debug('localstorage have data');
+        log.debug('localstorage have appData');
         appData = JSON.parse(localStorage.getItem('appData'));
         if (appData.version !== app.version) {
             log.debug('The api version is different');
@@ -110,7 +115,67 @@ function checkApp() {
         // Init the app for first time
         initApp(true);
     }
+    // Check favorites on localstorage
+    if (localStorage.appFavorites) {
+        log.debug('localstorage have appFavorites');
+        appFavorites = JSON.parse(localStorage.getItem('appFavorites'));
+        //appFavorites.ids = appFavorites.favorites.map(function(a) {return a.id;});
+    } else {
+        log.debug('set appFavorites');
+        localStorage.setItem('appFavorites', JSON.stringify(appFavorites));
+    }
+}
 
+function addToFavorites(context) {
+
+    //var idArray = appFavorites.map(function(a) {return a.id;});
+    //log.debug(idArray);
+    var index = appFavorites.ids.indexOf(context.id);
+    var added = true; // return this to know if added or removed
+    if (index > -1){
+        // The item exists so we ll remove it
+        added = false;
+        appFavorites.favorites.splice(index, 1);
+        appFavorites.ids.splice(index, 1);
+        localStorage.setItem('appFavorites', JSON.stringify(appFavorites));
+        changeFavoriteNum(context.id, 'decrease');
+    } else {
+        // the item does not exists on favorites so we can add it
+        appFavorites.favorites.unshift(context);
+        appFavorites.ids = appFavorites.favorites.map(function(a) {return a.id;});
+        localStorage.setItem('appFavorites', JSON.stringify(appFavorites));
+        log.debug(appFavorites);
+        changeFavoriteNum(context.id, 'increase');
+    }
+    return added;
+}
+
+function changeFavoriteNum(id, action) {
+    var url;
+    if (action === 'increase') {
+        url = settings.baseUrl + 'favorites/increase/' + id;
+    } else if (action === 'decrease') {
+        url = settings.baseUrl + 'favorites/decrease/' + id;
+    }
+
+    // Do the request
+    axios.put(url)
+        .then(function (response) {
+            log.debug(response.status);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+}
+
+function isInFavorites(id, el) {
+    var index = appFavorites.ids.indexOf(id);
+    if (index > -1){
+        el.text('favorite');
+    } else {
+        el.text('favorite_border');
+    }
 }
 
 function initApp(firstTime) {
@@ -216,7 +281,18 @@ $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
         .catch(function (error) {
             console.log(error);
         });
+});
 
+$$(document).on('page:init', '.page[data-name="favorites"]', function (e) {
+    log.debug("favorites...");
+
+    var context = {
+        data: fixData(appFavorites.favorites)
+    }
+
+    var html = compiledListTemplate(context);
+
+    $$('#favorites-list').html(html);
 });
 
 $$(document).on('page:init', '.page[data-name="details"]', function (e) {
@@ -241,7 +317,7 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
     var page = e.detail;
     var url = settings.baseUrl + 'items/' + page.route.params.id;
 
-    // Request data
+    // Request data for one item
     axios.get(url, {})
         .then(function (response) {
             log.debug(response.data);
@@ -262,38 +338,30 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
             var html = compiledDetailsTemplate(context);
             $$('#details-div').html(html);
 
-            // fix data for the swiper gallery
-            if (context.gallery !== "") {
-                context.gallery = context.gallery.split(',');
-                context.gallery = context.gallery.map(function (e) {
-                    return settings.imagesUrl + e
-                });
-            } else if (context.image !== "") {
-                context.gallery = [];
-                context.gallery[0] = settings.imagesUrl + context.image;
-            } else {
-                context.gallery = [];
-                context.gallery[0] = "images/placeholder.png";
-            }
-
             var galleryContext = {
-                data: context.gallery
+                data: setGalleryData(context)
             };
 
             log.debug(galleryContext);
 
             var galleryhtml = compiledGalleryTemplate(galleryContext);
             console.log(galleryhtml);
-
             $$('#gallery-list').html(galleryhtml);
 
             var mySwiper = app.swiper.get('#details-swiper');
-
             mySwiper.update();
 
-
+            var el = $$('.fav-icon');
+            isInFavorites(context.id, el);
             $$('#add-to-fav').on('click', function (e) {
                 log.debug('click...');
+
+                var added = addToFavorites(context);
+                if (added) {
+                    $$('.fav-icon').text('favorite');
+                } else {
+                    $$('.fav-icon').text('favorite_border');
+                }
                 // Show toast
                 var toastBottom = app.toast.create({
                     text: context.title + ': Προστέθηκε στα αγαπημένα.',
@@ -302,14 +370,10 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
                 toastBottom.open();
             });
 
-
-
         })
         .catch(function (error) {
             log.error(error);
         });
-
-
 
 });
 
@@ -357,8 +421,8 @@ $$(document).on('page:init', '.page[data-name="details-demo"]', function (e) {
 
 });
 
-$$(document).on('page:init', '.page[data-name="about"]', function (e) {
-    log.debug("about...");
+$$(document).on('page:init', '.page[data-name="debug"]', function (e) {
+    log.debug("debug...");
 
     var page = e.detail;
     //navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
@@ -494,23 +558,51 @@ function distance(lat1, lon1, lat2, lon2) {
 function fixData(data) {
 
     data.forEach(function (arrayItem) {
-        arrayItem.distance = distance(arrayItem.lat, arrayItem.lng, appCoords.lat, appCoords.lng);
+
+        if (arrayItem.lat) {
+            arrayItem.distance = distance(arrayItem.lat, arrayItem.lng, appCoords.lat, appCoords.lng);
+        } else {
+            arrayItem.distance = "";
+        }
+        var placeHolder = 'images/placeholder.png';
+        var placeHolderThumb = 'images/thumbs/placeholder.jpg';
+
         if (arrayItem.likes === null) {
             arrayItem.likes = 0;
         }
-        if (arrayItem.thumbnail === "") {
-            arrayItem.thumbnail = "images/thumbs/placeholder.jpg"
-        } else {
+        if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
+            arrayItem.thumbnail = placeHolderThumb;
+        } else if (!arrayItem.thumbnail.startsWith("http")) {
             arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
         }
-        if (arrayItem.image === "") {
-            arrayItem.image = "images/placeholder.png"
-        } else {
+        if (arrayItem.image === "" || arrayItem.image === placeHolder) {
+            arrayItem.image = placeHolder;
+        } else if (!arrayItem.image.startsWith("http")) {
             arrayItem.image = settings.imagesUrl + arrayItem.image;
         }
     });
     log.debug(data);
 
     return data;
+}
+
+
+// Set data for the swiper gallery
+function setGalleryData(context) {
+
+    if (context.gallery !== "") {
+        context.gallery = context.gallery.split(',');
+        context.gallery = context.gallery.map(function (e) {
+            return settings.imagesUrl + e
+        });
+    } else if (context.image !== "") {
+        context.gallery = [];
+        context.gallery[0] = settings.imagesUrl + context.image;
+    } else {
+        context.gallery = [];
+        context.gallery[0] = "images/placeholder.png";
+    }
+
+    return context.gallery;
 }
 

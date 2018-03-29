@@ -26,7 +26,7 @@ var routes = [
         url: 'pages/favorites.html'
     },
     {
-        path: '/about/:user/',
+        path: '/about/',
         url: './pages/about.html'
     },
     {
@@ -39,6 +39,10 @@ var routes = [
     },
     {
         path: '/details-template/:id/',
-        url: './templates/details.html',
+        url: './templates/details.html'
+    },
+    {
+        path: '/debug/',
+        url: './pages/debug.html'
     }
 ];
