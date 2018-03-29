@@ -44,5 +44,9 @@ var routes = [
     {
         path: '/debug/',
         url: './pages/debug.html'
+    },
+    {
+        path: '/settings/',
+        url: './pages/settings.html'
     }
 ];
