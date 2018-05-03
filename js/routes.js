@@ -1,7 +1,15 @@
 var routes = [
     {
+        path: '/',
+        url: './index.html'
+    },
+    {
         path: '/info/',
         url: 'pages/info.html'
+    },
+    {
+        path: '/near/',
+        url: './pages/near.html'
     },
     {
         path: '/places/',
