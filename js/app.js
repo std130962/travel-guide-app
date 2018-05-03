@@ -70,7 +70,7 @@ var onGeolocationSuccess = function(position) {
     appGeoData.altitudeAccuracy = position.coords.altitudeAccuracy;
     appGeoData.heading = position.coords.heading;
     appGeoData.speed = position.coords.speed;
-    appGeoData.timestamp = position.timestamp;
+    appGeoData.timestamp = position.timestamp / 1000;
     appGeoData.success = true;
 
     localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
@@ -533,6 +533,31 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
 
     log.debug(page.route.params);
     log.debug(page.router.currentRoute);
+
+
+    $$('#send-history').on('click', function (e) {
+        log.debug('send history');
+
+        var url = settings.baseUrl + 'history';
+        axios({
+            method: 'post',
+            url: url,
+            data: {
+                guid: appData.guid,
+                lat: appGeoData.latitude,
+                lng: appGeoData.longitude,
+                timestamp: appGeoData.timestamp
+            }
+        })
+            .then(function (response) {
+                log.debug(response);
+            })
+            .catch(function (error) {
+                log.debug(error);
+            });
+    });
+
+
 
 });
 
