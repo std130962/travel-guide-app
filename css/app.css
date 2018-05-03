@@ -37,6 +37,7 @@
 
 /* Rules for sizing the icon. */
 .material-icons.md-8 { font-size: 8px; }
+.material-icons.md-16 { font-size: 16px; }
 .material-icons.md-18 { font-size: 18px; }
 .material-icons.md-24 { font-size: 24px; }
 .material-icons.md-36 { font-size: 36px; }
@@ -52,14 +53,13 @@
 .demo-swiper .swiper-slide {
 
     background-size: cover;
-    font-size: 25px;
+    font-size: 14px;
     font-weight: 300;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-end;
     /*background: #fff;*/
     color: #000;
-
 
 }
 .demo-swiper .swiper-slide {
@@ -69,17 +69,30 @@
 }
 .demo-swiper {
     margin: 0px 0 0px;
-    font-size: 18px;
-    height: 280px;
+    /*font-size: 18px;*/
+    height: 180px;
 }
+
+.demo-swiper-multiple .swiper-slide {
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    background: #fff;
+}
+
+.demo-swiper-multiple {
+    margin: 0px 0 35px;
+
+    height: 120px;
+}
+
 .demo-swiper.demo-swiper-auto .swiper-slide {
-    width: 85%;
-}
-.demo-swiper.demo-swiper-auto .swiper-slide:nth-child(2n) {
-    width: 70%;
-}
-.demo-swiper.demo-swiper-auto .swiper-slide:nth-child(3n) {
-    width: 30%;
+    margin: 0px 0 35px;
+    padding: 0 0 5px 5px;
+    height: 150px;
+    width: 150px;
+    color: white;
+    text-shadow: 2px 2px 4px #000000;
+    border-radius: 6px;
 }
 
 
@@ -94,4 +107,53 @@
 
 .item-media img {
     border-radius: 6px;
+}
+
+.list .item-title {
+    font-weight: 600;
+}
+
+
+.button {
+    white-space: normal;
+    border-radius: 5px;
+    padding: 0 4px;
+}
+.md .button {
+
+    text-transform: none;
+    padding: 0 4px;
+    border-radius: 5px;
+}
+
+.md .button.button-big, .md .button.button-big-md {
+    height: 88px;
+    line-height: 18px;
+    border-radius: 5px;
+    padding: 8px 6px 0 6px;
+
+}
+
+.list-preloader {
+    margin-top: 50px;
+}
+
+.swiper-slide > a {
+    color: white !important;
+}
+
+.popover {
+    width: 220px;
+}
+
+.md .popover .list .item-content {
+    padding-left: 6px;
+
+}
+.popover .list .item-title {
+    font-weight: 500;
+}
+
+.md .popover .list .item-media+.item-inner {
+    margin-left: 2px;
 }
