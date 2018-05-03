@@ -3,7 +3,8 @@
 <head>
     <!-- Required meta tags-->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <!-- Color theme for statusbar -->
     <meta name="theme-color" content="#2196f3">
@@ -35,15 +36,25 @@
                 </li>
                 <li>
                     <a href="/info/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark text-color-orange">import_contacts</i></div>
+                        <div class="item-media"><i class="material-icons md-dark text-color-orange">import_contacts</i>
+                        </div>
                         <div class="item-inner">
                             <div class="item-title">Γενικές Πληροφορίες</div>
                         </div>
                     </a>
                 </li>
                 <li>
+                    <a href="/near/" class="item-link item-content panel-close">
+                        <div class="item-media"><i class="material-icons md-dark text-color-orange">place</i></div>
+                        <div class="item-inner">
+                            <div class="item-title">Κοντά σας</div>
+                        </div>
+                    </a>
+                </li>
+                <li>
                     <a href="/places/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark text-color-orange">location_city</i></div>
+                        <div class="item-media"><i class="material-icons md-dark text-color-orange">location_city</i>
+                        </div>
                         <div class="item-inner">
                             <div class="item-title">Οικισμοί</div>
                             <div class="item-after">12</div>
@@ -52,7 +63,8 @@
                 </li>
                 <li>
                     <a href="/sights/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark text-color-orange">local_activity</i></div>
+                        <div class="item-media"><i class="material-icons md-dark text-color-orange">local_activity</i>
+                        </div>
                         <div class="item-inner">
                             <div class="item-title">Αξιοθέατα</div>
                         </div>
@@ -60,7 +72,8 @@
                 </li>
                 <li>
                     <a href="/beaches/" class="item-link item-content panel-close">
-                        <div class="item-media"><i class="material-icons md-dark text-color-orange">beach_access</i></div>
+                        <div class="item-media"><i class="material-icons md-dark text-color-orange">beach_access</i>
+                        </div>
                         <div class="item-inner">
                             <div class="item-title">Παραλίες</div>
                         </div>
@@ -139,14 +152,143 @@
             </div>-->
 
             <div class="page-content">
-                <div class="block-title">Μικρός ταξιδιωτικός οδηγός Σύρου</div>
-                <div class="block block-strong">
-                    <p>Καλώς ήρθατε στον μικρό ταξιδιωτικό οδηγό της Σύρου</p>
-                    <p>Βρείτε πληροφορίες για τους οικισμούς, τα αξιοθέατα, τις παραλίες του νησιού</p>
 
-                    <!-- Link to another page -->
-                    <a href="/about/12/">About app</a>
+                <div class="block ">
+                    <div class="row">
+                        <div class="col-33">
+                            <p class="row">
+                                <a href="/info/" class="col button button-big button-raised button-fill">
+                                    <i class="material-icons md-18 md-light">import_contacts</i><br>Γενικές πληροφορίες
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-66">
+                            <p class="row">
+                                <a href="/sights/" class="col button button-fill"><i class="material-icons md-18 md-light">local_activity</i> Αξιοθέατα</a>
+                                <a href="/places/" class="col button button-fill"><i class="material-icons md-18 md-light">location_city</i> Οικισμοί</a>
+                            </p>
+                            <p class="row">
+                                <a href="/beaches/" class="col button button-fill"><i class="material-icons md-18 md-light">beach_access</i> Παραλίες</a>
+                                <a href="/map/"  class="col button button-fill"><i class="material-icons md-18 md-light">map</i> Χάρτης</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="block2 ">
+                    <div class="block-title">
+                        <div class="row">
+                            <div class="col-66">Κοντά σας...</div>
+                            <div class="col-33 text-align-right">Όλα</div>
+                        </div>
+                    </div>
+                    <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10"
+                         data-slides-per-view="auto" data-prevent-clicks="true"  data-prevent-clicks-propagation="true"
+                         class="swiper-container swiper-init demo-swiper demo-swiper-auto">
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-wrapper">
+                            <div href="/map/" class="swiper-slide" style="background-image:url(https://picsum.photos/150/150?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                            <div class="swiper-slide" style="background-image:url(https://picsum.photos/150/150?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                            <div class="swiper-slide" style="background-image:url(https://picsum.photos/150/150?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                            <div class="swiper-slide" style="background-image:url(https://picsum.photos/100/100?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                            <div class="swiper-slide" style="background-image:url(https://picsum.photos/100/100?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                            <div class="swiper-slide" style="background-image:url(https://picsum.photos/100/100?random)">
+                                <a href="/map/">Αρχαιολογικό μουσείο Ερμούπολης</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-title">
+                        <div class="row">
+                            <div class="col-66">Δημοφιλή ...</div>
+                            <div class="col-33 text-align-right"><a href="/info/" class="link"><i
+                                    class="material-icons">view_list</i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10"
+                         data-slides-per-view="auto"
+                         class="swiper-container swiper-init demo-swiper demo-swiper-auto">
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/150/150?random)">
+                                Αρχαιολογικό μουσείο Ερμούπολης
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/150/150?random)">
+                                Slide 2
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/150/150?random)">
+                                Slide 3
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 4
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 5
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 6
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-title">
+                        <div class="row">
+                            <div class="col-66">Αγαπημένα ...</div>
+                            <div class="col-33 text-align-right"><a href="/favorites/" class="link"><i
+                                    class="material-icons">view_list</i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-pagination='{"el": ".swiper-pagination"}' data-space-between="10"
+                         data-slides-per-view="auto"
+                         class="swiper-container swiper-init demo-swiper demo-swiper-auto">
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Αρχαιολογικό μουσείο Ερμούπολης
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 2
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 3
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 4
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 5
+                            </div>
+                            <div class="swiper-slide"
+                                 style="background-image:url(https://picsum.photos/100/100?random)">
+                                Slide 6
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 
                 <div class="block-title">Επιλέξτε:</div>
                 <div class="list media-list ">
@@ -164,14 +306,14 @@
                         </li>
                         <li>
                             <a href="/places/" class="item-link item-content">
-                            <div class="item-media"><img src="images/thumbs/places.jpg" width="74"/></div>
-                            <div class="item-inner">
-                                <div class="item-title-row">
-                                    <div class="item-title">Οικισμοί</div>
+                                <div class="item-media"><img src="images/thumbs/places.jpg" width="74"/></div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">Οικισμοί</div>
+                                    </div>
+                                    <div class="item-subtitle">Οι οικισμοί του νησιού</div>
                                 </div>
-                                <div class="item-subtitle">Οι οικισμοί του νησιού</div>
-                            </div>
-                        </a>
+                            </a>
                         </li>
                         <li>
                             <a href="/sights/" class="item-link item-content">
@@ -199,28 +341,65 @@
                 </div>
 
 
-
-
-
-
             </div>
         </div>
     </div>
 </div>
+
+
+
+<div class="popover sort-popover">
+    <div class="popover-inner">
+        <div class="block">
+            <div class="block-title">Ταξινόμηση κατά ...</div>
+            <div class="list">
+                <ul>
+                    <li>
+                        <div  href="#" class=" item-content">
+                            <div class="item-media"><i class="material-icons text-color-orange">location_on</i></div>
+                            <div class="item-inner">
+                                <div class="item-title">Απόσταση</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="material-icons text-color-orange">whatshot</i></div>
+                            <div class="item-inner">
+                                <div class="item-title">Δημοφιλή</div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media"><i class="material-icons text-color-orange">sort_by_alpha</i></div>
+                            <div class="item-inner">
+                                <div class="item-title">Αλφαβητικά</div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!-- Templates -->
 <script id="beaches-template" type="text/template7">
     {{#each data}}
     <li>
-    <a href="/details/" class="item-link item-content">
-        <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
-        <div class="item-inner">
-        <div class="item-title-row">
-        <div class="item-title">{{title}}</div>
-        </div>
-        <div class="item-subtitle">{{intro}}</div>
-            <div>1500 μέτρα</div>
-    </div>
-    </a>
+        <a href="/details/" class="item-link item-content">
+            <div class="item-media"><img src="https://picsum.photos/100/100?random" width="74"/></div>
+            <div class="item-inner">
+                <div class="item-title-row">
+                    <div class="item-title">{{title}}</div>
+                </div>
+                <div class="item-subtitle">{{intro}}</div>
+                <div>1500 μέτρα</div>
+            </div>
+        </a>
     </li>
     {{/each}}
 </script>
@@ -236,8 +415,12 @@
                 </div>
                 <div class="item-subtitle">{{intro}}</div>
                 <div class="row">
-                    <div class="col-50"><small><span class="text-color-orange">{{likes}} &#10084;</span> </small></div>
-                    <div class="col-50"><small><span class="text-color-orange"></span></small></div>
+                    <div class="col-50">
+                        <small><span class="text-color-orange">{{likes}} &#10084;</span></small>
+                    </div>
+                    <div class="col-50">
+                        <small><span class="text-color-orange"></span></small>
+                    </div>
                 </div>
             </div>
         </a>
@@ -256,8 +439,15 @@
                 </div>
                 <div class="item-subtitle">{{intro}} &nbsp;</div>
                 <div class="row">
-                    <div class="col-20"><small><span class="text-color-orange">{{likes}} &#10084;</span> </small></div>
-                    <div class="col-80"><small><span class="text-color-blue">{{distance}}</span></small></div>
+                    <div class="col-20">
+                        <small><span class="text-color-orange">{{likes}} &#10084;</span></small>
+                    </div>
+                    <div class="col-30">
+                        <small><span class="text-color-blue">{{distance}}</span></small>
+                    </div>
+                    <div class="col-30">
+                        <small><span class="text-color-green">{{category}}</span></small>
+                    </div>
                 </div>
             </div>
         </a>
@@ -276,11 +466,10 @@
         <div class="col-20 text-color-orange">{{likes}} &#10084;</div>
         <div class="col-40 text-color-blue">{{#if lat}} {{distance}} {{/if}}</div>
         <div class="col-20">
-            <button class="button button-small"><i class="material-icons md-dark orange600">map</i></button>
+            <a href="#" class="link"><i class="material-icons md-dark orange600">map</i></a>
         </div>
         <div class="col-20">
-            <button id="add-to-fav" class="button button-small "><i class="fav-icon material-icons md-dark orange600">favorite_border</i>
-            </button>
+            <a href="#" class="link" id="add-to-fav"><i class="fav-icon material-icons md-dark orange600">favorite_border</i></a>
         </div>
     </div>
     <div class="block">
@@ -300,4 +489,4 @@
 <script type="text/javascript" src="js/routes.js"></script>
 <script type="text/javascript" src="js/app.js"></script>
 </body>
-</html>
+</html>                                      

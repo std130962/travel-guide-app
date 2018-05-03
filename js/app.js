@@ -13,6 +13,10 @@ var app = new Framework7({
     panel: {
         swipe: 'left',
     },
+    statusbar: {
+        enabled: true,
+        overlay: true,
+    },
     // Add default routes
     routes: routes
 
@@ -25,7 +29,11 @@ var settings = {
     imagesUrl: 'http://travel-guide.lrn.gr/api/public/images/',
     // Debug mode for logging - debug, info, error
     mode: 'debug',
-
+    // If geolocation fail on device use these lat-lng as defaults
+    coords: {
+        lng: 24.940424,
+        lat: 37.441811
+    }
 };
 
 log.setLevel(settings.mode);
@@ -39,38 +47,103 @@ var appFavorites = {
     favorites: [],
     ids: []
 };
+var appGeoData = {};
 
-
-// Initialize deviceData with fake data in case the app run from browser (Debugging mode)
+// Initialize deviceData with default data in case the app run from browser (Debugging mode)
 var deviceData = {
     cordova: "web",
     model: "web",
     platform: "web",
-    uuid: "web",
+    uuid: 0,
     version: "web",
     manufacturer: "web",
     isVirtual: "web",
-    serial: "web"
+    serial: 0
 };
+
+var onGeolocationSuccess = function(position) {
+    log.debug('onGeolocationSuccess');
+    appGeoData.latitude = position.coords.latitude;
+    appGeoData.longitude = position.coords.longitude;
+    appGeoData.altitude = position.coords.altitude;
+    appGeoData.accuracy = position.coords.accuracy;
+    appGeoData.altitudeAccuracy = position.coords.altitudeAccuracy;
+    appGeoData.heading = position.coords.heading;
+    appGeoData.speed = position.coords.speed;
+    appGeoData.timestamp = position.timestamp;
+    appGeoData.success = true;
+
+    localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
+
+    log.debug(appGeoData);
+
+    var toastWithCustomButton = app.toast.create({
+        text: 'lng: ' +  position.coords.longitude + ' lat: ' + position.coords.latitude,
+        closeButton: true,
+        closeButtonText: 'Close',
+        closeButtonColor: 'red',
+    });
+    toastWithCustomButton.open();
+};
+
+var onGeolocationError = function(error) {
+    log.debug('onGeolocationError');
+    //If localstorage have previous geo data use them
+    if (localStorage.appGeoData) {
+        log.debug('localstorage have appGeoData');
+        appGeoData = JSON.parse(localStorage.getItem('appGeoData'));
+        appGeoData.success = false;
+    } else {
+        //No appGeoData on localstorage and geolocation fail
+        //Use defaults lng lat from settings
+        appGeoData.latitude = settings.coords.lat;
+        appGeoData.longitude =settings.coords.lng;
+        appGeoData.altitude = '';
+        appGeoData.accuracy = '';
+        appGeoData.altitudeAccuracy = '';
+        appGeoData.heading = '';
+        appGeoData.speed = '';
+        appGeoData.timestamp = '';
+        appGeodata.success = false;
+
+        localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
+    }
+
+    var text = 'code: ' + error.code + ' | ' + 'message: ' + error.message + '\n' ;
+    log.debug(text);
+    var toastWithCustomButton = app.toast.create({
+        text: text,
+        closeButton: true,
+        closeButtonText: 'Close',
+        closeButtonColor: 'red',
+    });
+    toastWithCustomButton.open();
+};
+
 
 if (app.device.cordova) {
     log.debug('It is inside cordova');
     document.addEventListener("deviceready", onDeviceReady, false);
 } else {
-    //if app run on Cordova the checkApp will happen onDeviceReady
+    //if app run on Cordova the checkApp will happens onDeviceReady
     checkApp();
+
 }
+
 
 function onDeviceReady() {
     log.debug('Inside onDeviceReady');
     document.addEventListener("pause", onPause, false);
     document.addEventListener("resume", onResume, false);
+
+    document.addEventListener("backbutton", onBackKeyDown, false);
     // Add similar listeners for other events
 
     setDeviceData();
-    //navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
+
     checkApp();
 }
+
 
 
 function onPause() {
@@ -81,8 +154,23 @@ function onResume() {
     // Handle the resume event
 }
 
+// For Android back button
+function onBackKeyDown() {
+
+    var panelLeft = app.panel.get('left');
+    if (panelLeft.opened ) {
+        app.panel.close('left');
+
+    } else {
+        mainView.router.back();
+    }
+
+}
+
+
 
 var mainView = app.views.create('.view-main');
+//app.statusbar.show();
 
 // Compile the templates
 var beachesTemplate = $$('script#beaches-template').html();
@@ -100,6 +188,19 @@ var compiledGalleryTemplate = Template7.compile(galleryTemplate);
 var detailsTemplate = $$('script#details-template').html();
 var compiledDetailsTemplate = Template7.compile(detailsTemplate);
 
+// If app runs on Cordova set device data
+function setDeviceData() {
+    log.debug('Set Device Data');
+    deviceData.cordova = device.cordova;
+    deviceData.model = device.model;
+    deviceData.platform = device.platform;
+    deviceData.uuid = device.uuid;
+    deviceData.version = device.version;
+    deviceData.manufacturer = device.manufacturer;
+    deviceData.isVirtual = device.isVirtual;
+    deviceData.serial = device.serial;
+    log.debug(deviceData);
+}
 //initilize the app - check if app run for first time
 function checkApp() {
     log.debug('Inside checkApp');
@@ -115,16 +216,51 @@ function checkApp() {
         // Init the app for first time
         initApp(true);
     }
+
+    // Check geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, { maximumAge: 5000, timeout: 15000, enableHighAccuracy: true });
+    } else {
+        // for browsers that dont support geolocation
+
+    }
+
     // Check favorites on localstorage
     if (localStorage.appFavorites) {
-        log.debug('localstorage have appFavorites');
+        log.debug('localstorage has appFavorites');
         appFavorites = JSON.parse(localStorage.getItem('appFavorites'));
         //appFavorites.ids = appFavorites.favorites.map(function(a) {return a.id;});
     } else {
         log.debug('set appFavorites');
         localStorage.setItem('appFavorites', JSON.stringify(appFavorites));
     }
+
+    showHomeComponents();
+
 }
+
+function initApp(firstTime) {
+    log.debug('Inside initApp');
+    appData.name = app.name;
+    appData.id = app.id;
+    appData.version = app.version;
+
+    // if app run for first time create a guid and register device
+    if (firstTime) {
+        log.debug('Init app for first time');
+        appData.guid = createGuid();
+        appData.authHeader = "Basic " + btoa(appData.guid);
+        registerDevice();
+    }
+
+    localStorage.setItem('appData', JSON.stringify(appData));
+}
+
+function showHomeComponents() {
+    $$('#home-fav').text('fav');
+    $$('#home-nearby').text('near');
+}
+
 
 function addToFavorites(context) {
 
@@ -178,48 +314,31 @@ function isInFavorites(id, el) {
     }
 }
 
-function initApp(firstTime) {
-    log.debug('Inside initApp');
-    appData.name = app.name;
-    appData.id = app.id;
-    appData.version = app.version;
 
-    // if app run for first time create a guid and register device
-    if (firstTime) {
-        log.debug('Init app for first time');
-        appData.guid = createGuid();
-        appData.authHeader = "Basic " + btoa(appData.guid);
-        registerDevice();
-    }
+$$(document).on('page:init', '.page[data-name="home"]', function (e) {
+    log.debug("Init home");
 
-    localStorage.setItem('appData', JSON.stringify(appData));
-}
-
+});
 
 $$(document).on('page:init', '.page[data-name="places"]', function (e) {
+    log.debug("Init places");
 
     url = settings.baseUrl + 'places';
-    axios.get(url, {
-        params: {}
-    })
+    axios.get(url)
         .then(function (response) {
             var context = {
                 data: fixData(response.data)
             };
-
             var html = compiledListTemplate(context);
-
             $$('#places-list').html(html);
-
         })
         .catch(function (error) {
             console.log(error);
         });
-
 });
 
 $$(document).on('page:init', '.page[data-name="info"]', function (e) {
-    log.debug("info...");
+    log.debug("Init info");
 
     url = settings.baseUrl + 'info';
     axios.get(url, {})
@@ -227,56 +346,42 @@ $$(document).on('page:init', '.page[data-name="info"]', function (e) {
             var context = {
                 data: fixData(response.data)
             };
-
-            //var html = compiledBeachesTemplate(context);
             var html = compiledInfoTemplate(context);
-
             $$('#info-list').html(html);
-
         })
         .catch(function (error) {
             console.log(error);
         });
-
 });
 
 $$(document).on('page:init', '.page[data-name="beaches"]', function (e) {
-    log.debug("beaches...");
+    log.debug("Init beaches");
 
     url = settings.baseUrl + 'beaches';
-    axios.get(url, {})
+    axios.get(url)
         .then(function (response) {
             var context = {
                 data: fixData(response.data)
             };
-
-            //var html = compiledBeachesTemplate(context);
             var html = compiledListTemplate(context);
-
             $$('#beaches-list').html(html);
-
         })
         .catch(function (error) {
             console.log(error);
         });
-
 });
 
 $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
-    log.debug("sights...");
+    log.debug("init sights");
 
     url = settings.baseUrl + 'sights';
     axios.get(url)
         .then(function (response) {
-            var data = response.data;
             var context = {
                 data: fixData(response.data)
             };
-
             var html = compiledListTemplate(context);
-
             $$('#sights-list').html(html);
-
         })
         .catch(function (error) {
             console.log(error);
@@ -284,28 +389,22 @@ $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
 });
 
 $$(document).on('page:init', '.page[data-name="favorites"]', function (e) {
-    log.debug("favorites...");
+    log.debug("Init favorites");
 
     var context = {
         data: fixData(appFavorites.favorites)
-    }
+    };
 
     var html = compiledListTemplate(context);
-
     $$('#favorites-list').html(html);
 });
 
 $$(document).on('page:init', '.page[data-name="details"]', function (e) {
-    log.debug('Inside details...');
+    log.debug('Init details');
     url = settings.baseUrl + 'items/2';
-    axios.get(url, {
-        params: {
-            ID: 12345
-        }
-    })
+    axios.get(url)
         .then(function (response) {
             log.debug(response);
-
         })
         .catch(function (error) {
             log.error(error);
@@ -313,12 +412,12 @@ $$(document).on('page:init', '.page[data-name="details"]', function (e) {
 });
 
 $$(document).on('page:init', '.page[data-name="details-template"]', function (e) {
-    log.debug('Inside details template...');
+    log.debug('Inside details template');
     var page = e.detail;
     var url = settings.baseUrl + 'items/' + page.route.params.id;
 
     // Request data for one item
-    axios.get(url, {})
+    axios.get(url)
         .then(function (response) {
             log.debug(response.data);
 
@@ -435,50 +534,10 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
     log.debug(page.route.params);
     log.debug(page.router.currentRoute);
 
-
 });
 
-var onGeolocationSuccess = function (position) {
-    console.log('Inside onGeolocationSuccess');
 
-    $$('#geolocation-latitude').text(position.coords.latitude);
-    $$('#geolocation-longitude').text(position.coords.longitude);
-    $$('#geolocation-altitude').text(position.coords.altitude);
-    $$('#geolocation-accuracy').text(position.coords.accuracy);
 
-    $$('#geolocation-timestamp').text(position.timestamp);
-
-    appData = 'Latitude: ' + position.coords.latitude + '\n' +
-        'Longitude: ' + position.coords.longitude + '\n' +
-        'Altitude: ' + position.coords.altitude + '\n' +
-        'Accuracy: ' + position.coords.accuracy + '\n' +
-        'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
-        'Heading: ' + position.coords.heading + '\n' +
-        'Speed: ' + position.coords.speed + '\n' +
-        'Timestamp: ' + position.timestamp + '\n';
-    log.debug(appData);
-};
-
-// onError Callback receives a PositionError object
-//
-function onGeolocationError(error) {
-    log.debug('Inside onGeolocationError');
-    log.error(error.code + " " + error.message);
-}
-
-function setDeviceData() {
-    log.debug('Set Device Data');
-    deviceData.cordova = device.cordova;
-    deviceData.model = device.model;
-    deviceData.platform = device.platform;
-    deviceData.uuid = device.uuid;
-    deviceData.version = device.version;
-    deviceData.manufacturer = device.manufacturer;
-    deviceData.isVirtual = device.isVirtual;
-    deviceData.serial = device.serial;
-    log.debug(deviceData);
-
-}
 
 
 function putDeviceData() {
@@ -494,6 +553,7 @@ function putDeviceData() {
 
 }
 
+// Create guid
 function createGuid() {
 
     function s4() {
@@ -503,7 +563,6 @@ function createGuid() {
     }
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-
 }
 
 function checkConnection() {
@@ -514,7 +573,7 @@ function checkConnection() {
 
 function registerDevice() {
     log.debug('Register the device');
-    //var url = settings.baseUrl + 'register';
+
     var url = settings.baseUrl + 'register';
     // var authHeader = 'Basic ' + btoa(app.guid);
     var data = {
