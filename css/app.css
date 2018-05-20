@@ -73,6 +73,10 @@
     height: 180px;
 }
 
+#details-swiper {
+    height: 250px;
+}
+
 .demo-swiper-multiple .swiper-slide {
     box-sizing: border-box;
     border: 1px solid #ccc;
