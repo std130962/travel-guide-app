@@ -173,6 +173,15 @@ var mainView = app.views.create('.view-main');
 //app.statusbar.show();
 
 // Compile the templates
+var homeFavoritesTemplate = $$('script#home-favorites-template').html();
+var compiledHomeFavoritesTemplate = Template7.compile(homeFavoritesTemplate);
+
+var homeNearbyTemplate = $$('script#home-nearby-template').html();
+var compiledHomeNearbyTemplate = Template7.compile(homeNearbyTemplate);
+
+var homePopularTemplate = $$('script#home-popular-template').html();
+var compiledHomePopularTemplate = Template7.compile(homePopularTemplate);
+
 var beachesTemplate = $$('script#beaches-template').html();
 var compiledBeachesTemplate = Template7.compile(beachesTemplate);
 
@@ -187,6 +196,8 @@ var compiledGalleryTemplate = Template7.compile(galleryTemplate);
 
 var detailsTemplate = $$('script#details-template').html();
 var compiledDetailsTemplate = Template7.compile(detailsTemplate);
+
+
 
 // If app runs on Cordova set device data
 function setDeviceData() {
@@ -259,6 +270,8 @@ function initApp(firstTime) {
 function showHomeComponents() {
     $$('#home-fav').text('fav');
     $$('#home-nearby').text('near');
+
+    createHomeSliders();
 }
 
 
@@ -317,7 +330,7 @@ function isInFavorites(id, el) {
 
 $$(document).on('page:init', '.page[data-name="home"]', function (e) {
     log.debug("Init home");
-
+    createHomeSliders();
 });
 
 $$(document).on('page:init', '.page[data-name="places"]', function (e) {
@@ -564,7 +577,6 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
 
 
 
-
 function putDeviceData() {
 
     $$('#device-cordova').text(deviceData.cordova);
@@ -693,3 +705,95 @@ function setGalleryData(context) {
     return context.gallery;
 }
 
+
+function createHomeSliders() {
+    //var url = settings.baseUrl + 'all';
+    var urlNearby = "http://travel-guide.lrn.gr/api/public/index.php/all?limit=6&offset=0";
+    axios({
+        method: 'get',
+        url: urlNearby,
+    })
+        .then(function (response) {
+            log.debug(response.data);
+            var data = response.data;
+            var placeHolderThumb = 'images/thumbs/placeholder.jpg';
+            data.forEach(function (arrayItem) {
+                if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
+                    arrayItem.thumbnail = placeHolderThumb;
+                } else if (!arrayItem.thumbnail.startsWith("http")) {
+                    arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
+                }
+            });
+
+            log.debug(data);
+
+            var context = {
+                data: data
+            };
+
+            var html = compiledHomeNearbyTemplate(context);
+            log.debug(compiledHomeNearbyTemplate(context));
+            $$('#home-nearby').html(html);
+
+            var mySwiper = app.swiper.get('#home-nearby-swiper');
+            mySwiper.update();
+        })
+        .catch(function (error) {
+            log.debug(error);
+        });
+
+    var urlPopular = "http://travel-guide.lrn.gr/api/public/index.php/all?limit=6&offset=0";
+    axios({
+        method: 'get',
+        url: urlPopular,
+    })
+        .then(function (response) {
+            log.debug(response.data);
+            var data = response.data;
+            var placeHolderThumb = 'images/thumbs/placeholder.jpg';
+            data.forEach(function (arrayItem) {
+                if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
+                    arrayItem.thumbnail = placeHolderThumb;
+                } else if (!arrayItem.thumbnail.startsWith("http")) {
+                    arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
+                }
+            });
+
+            var context = {
+                data: data
+            };
+
+            var html = compiledHomePopularTemplate(context);
+            log.debug(compiledHomePopularTemplate(context));
+            $$('#home-popular').html(html);
+
+            var mySwiper = app.swiper.get('#home-popular-swiper');
+            mySwiper.update();
+        })
+        .catch(function (error) {
+            log.debug(error);
+        });
+
+    // Favorites Swipper
+    var favoritesData = JSON.parse(localStorage.getItem('appFavorites'));
+    var favoritesContex = {
+        data: favoritesData.favorites.slice(0, 6)
+    };
+
+    log.debug(favoritesContex);
+
+    // Put a timeout for template to be ready
+    setTimeout(function(){
+        var favoritesHtml = compiledHomeFavoritesTemplate(favoritesContex);
+        $$('#home-favorites').html(favoritesHtml);
+        var myFavoritesSwiper = app.swiper.get('#home-favorites-swiper');
+        myFavoritesSwiper.update();
+        }, 1000);
+
+    //log.debug(compiledHomeFavoritesTemplate(context));
+
+
+
+
+
+}
