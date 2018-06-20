@@ -36,6 +36,7 @@ var settings = {
     }
 };
 
+// Set the logger mode
 log.setLevel(settings.mode);
 
 var appData = {};
@@ -49,7 +50,7 @@ var appFavorites = {
 };
 var appGeoData = {};
 
-// Initialize deviceData with default data in case the app run from browser (Debugging mode)
+// Initialize deviceData with defaults data in case the app run from browser (Debugging mode)
 var deviceData = {
     cordova: "web",
     model: "web",
@@ -77,13 +78,17 @@ var onGeolocationSuccess = function(position) {
 
     log.debug(appGeoData);
 
-    var toastWithCustomButton = app.toast.create({
-        text: 'lng: ' +  position.coords.longitude + ' lat: ' + position.coords.latitude,
-        closeButton: true,
-        closeButtonText: 'Close',
-        closeButtonColor: 'red',
-    });
-    toastWithCustomButton.open();
+    // Toast with geolocation info (for debug mode)
+    if (settings.mode === 'debug') {
+        var toastWithCustomButton = app.toast.create({
+            text: 'lng: ' +  position.coords.longitude + ' lat: ' + position.coords.latitude,
+            closeButton: true,
+            closeButtonText: 'Close',
+            closeButtonColor: 'red',
+        });
+        toastWithCustomButton.open();
+    }
+
 };
 
 var onGeolocationError = function(error) {
@@ -109,15 +114,18 @@ var onGeolocationError = function(error) {
         localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
     }
 
-    var text = 'code: ' + error.code + ' | ' + 'message: ' + error.message + '\n' ;
-    log.debug(text);
-    var toastWithCustomButton = app.toast.create({
-        text: text,
-        closeButton: true,
-        closeButtonText: 'Close',
-        closeButtonColor: 'red',
-    });
-    toastWithCustomButton.open();
+    if (settings.mode==='debug'){
+        var text = 'code: ' + error.code + ' | ' + 'message: ' + error.message + '\n' ;
+        log.debug(text);
+        var toastWithCustomButton = app.toast.create({
+            text: text,
+            closeButton: true,
+            closeButtonText: 'Close',
+            closeButtonColor: 'red',
+        });
+        toastWithCustomButton.open();
+    }
+
 };
 
 
@@ -247,8 +255,8 @@ function checkApp() {
     }
 
     showHomeComponents();
-
 }
+
 
 function initApp(firstTime) {
     log.debug('Inside initApp');
@@ -570,8 +578,6 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
             });
     });
 
-
-
 });
 
 
@@ -791,9 +797,6 @@ function createHomeSliders() {
         }, 1000);
 
     //log.debug(compiledHomeFavoritesTemplate(context));
-
-
-
-
+    
 
 }
