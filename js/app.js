@@ -62,7 +62,7 @@ var deviceData = {
     serial: 0
 };
 
-var onGeolocationSuccess = function(position) {
+var onGeolocationSuccess = function (position) {
     log.debug('onGeolocationSuccess');
     appGeoData.latitude = position.coords.latitude;
     appGeoData.longitude = position.coords.longitude;
@@ -81,7 +81,7 @@ var onGeolocationSuccess = function(position) {
     // Toast with geolocation info (for debug mode)
     if (settings.mode === 'debug') {
         var toastWithCustomButton = app.toast.create({
-            text: 'lng: ' +  position.coords.longitude + ' lat: ' + position.coords.latitude,
+            text: 'lng: ' + position.coords.longitude + ' lat: ' + position.coords.latitude,
             closeButton: true,
             closeButtonText: 'Close',
             closeButtonColor: 'red',
@@ -91,18 +91,18 @@ var onGeolocationSuccess = function(position) {
 
 };
 
-var onGeolocationError = function(error) {
+var onGeolocationError = function (error) {
     log.debug('onGeolocationError');
-    //If localstorage have previous geo data use them
+    //If localStorage have previous geo data use them
     if (localStorage.appGeoData) {
         log.debug('localstorage have appGeoData');
         appGeoData = JSON.parse(localStorage.getItem('appGeoData'));
         appGeoData.success = false;
     } else {
-        //No appGeoData on localstorage and geolocation fail
+        //No appGeoData on localStorage and geolocation fail
         //Use defaults lng lat from settings
         appGeoData.latitude = settings.coords.lat;
-        appGeoData.longitude =settings.coords.lng;
+        appGeoData.longitude = settings.coords.lng;
         appGeoData.altitude = '';
         appGeoData.accuracy = '';
         appGeoData.altitudeAccuracy = '';
@@ -114,8 +114,8 @@ var onGeolocationError = function(error) {
         localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
     }
 
-    if (settings.mode==='debug'){
-        var text = 'code: ' + error.code + ' | ' + 'message: ' + error.message + '\n' ;
+    if (settings.mode === 'debug') {
+        var text = 'code: ' + error.code + ' | ' + 'message: ' + error.message + '\n';
         log.debug(text);
         var toastWithCustomButton = app.toast.create({
             text: text,
@@ -135,7 +135,6 @@ if (app.device.cordova) {
 } else {
     //if app run on Cordova the checkApp will happens onDeviceReady
     checkApp();
-
 }
 
 
@@ -145,13 +144,11 @@ function onDeviceReady() {
     document.addEventListener("resume", onResume, false);
 
     document.addEventListener("backbutton", onBackKeyDown, false);
-    // Add similar listeners for other events
 
     setDeviceData();
 
     checkApp();
 }
-
 
 
 function onPause() {
@@ -166,7 +163,7 @@ function onResume() {
 function onBackKeyDown() {
 
     var panelLeft = app.panel.get('left');
-    if (panelLeft.opened ) {
+    if (panelLeft.opened) {
         app.panel.close('left');
 
     } else {
@@ -174,7 +171,6 @@ function onBackKeyDown() {
     }
 
 }
-
 
 
 var mainView = app.views.create('.view-main');
@@ -199,12 +195,14 @@ var compiledInfoTemplate = Template7.compile(infoTemplate);
 var listTemplate = $$('script#list-template').html();
 var compiledListTemplate = Template7.compile(listTemplate);
 
+var nearbyListTemplate = $$('script#list-template').html();
+var compiledNearbyListTemplate = Template7.compile(nearbyListTemplate);
+
 var galleryTemplate = $$('script#gallery-template').html();
 var compiledGalleryTemplate = Template7.compile(galleryTemplate);
 
 var detailsTemplate = $$('script#details-template').html();
 var compiledDetailsTemplate = Template7.compile(detailsTemplate);
-
 
 
 // If app runs on Cordova set device data
@@ -220,6 +218,7 @@ function setDeviceData() {
     deviceData.serial = device.serial;
     log.debug(deviceData);
 }
+
 //initilize the app - check if app run for first time
 function checkApp() {
     log.debug('Inside checkApp');
@@ -238,15 +237,19 @@ function checkApp() {
 
     // Check geolocation
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, { maximumAge: 5000, timeout: 15000, enableHighAccuracy: true });
+        navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, {
+            maximumAge: 5000,
+            timeout: 15000,
+            enableHighAccuracy: true
+        });
     } else {
         // for browsers that dont support geolocation
 
     }
 
-    // Check favorites on localstorage
+    // Check favorites on localStorage
     if (localStorage.appFavorites) {
-        log.debug('localstorage has appFavorites');
+        log.debug('localStorage has appFavorites');
         appFavorites = JSON.parse(localStorage.getItem('appFavorites'));
         //appFavorites.ids = appFavorites.favorites.map(function(a) {return a.id;});
     } else {
@@ -289,7 +292,7 @@ function addToFavorites(context) {
     //log.debug(idArray);
     var index = appFavorites.ids.indexOf(context.id);
     var added = true; // return this to know if added or removed
-    if (index > -1){
+    if (index > -1) {
         // The item exists so we ll remove it
         added = false;
         appFavorites.favorites.splice(index, 1);
@@ -299,7 +302,9 @@ function addToFavorites(context) {
     } else {
         // the item does not exists on favorites so we can add it
         appFavorites.favorites.unshift(context);
-        appFavorites.ids = appFavorites.favorites.map(function(a) {return a.id;});
+        appFavorites.ids = appFavorites.favorites.map(function (a) {
+            return a.id;
+        });
         localStorage.setItem('appFavorites', JSON.stringify(appFavorites));
         log.debug(appFavorites);
         changeFavoriteNum(context.id, 'increase');
@@ -328,7 +333,7 @@ function changeFavoriteNum(id, action) {
 
 function isInFavorites(id, el) {
     var index = appFavorites.ids.indexOf(id);
-    if (index > -1){
+    if (index > -1) {
         el.text('favorite');
     } else {
         el.text('favorite_border');
@@ -341,22 +346,7 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
     createHomeSliders();
 });
 
-$$(document).on('page:init', '.page[data-name="places"]', function (e) {
-    log.debug("Init places");
 
-    url = settings.baseUrl + 'places';
-    axios.get(url)
-        .then(function (response) {
-            var context = {
-                data: fixData(response.data)
-            };
-            var html = compiledListTemplate(context);
-            $$('#places-list').html(html);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
-});
 
 $$(document).on('page:init', '.page[data-name="info"]', function (e) {
     log.debug("Init info");
@@ -375,34 +365,94 @@ $$(document).on('page:init', '.page[data-name="info"]', function (e) {
         });
 });
 
-$$(document).on('page:init', '.page[data-name="beaches"]', function (e) {
-    log.debug("Init beaches");
+var context = {};
 
-    url = settings.baseUrl + 'beaches';
+
+function setTemplate(order) {
+    log.debug("inside setTemplates")
+
+    var url, el;
+
+    switch (app.views.main.router.currentRoute.url) {
+        case "/beaches/":
+            url = settings.baseUrl + 'beaches';
+            el = $$('#beaches-list');
+            break;
+        case "/sights/":
+            url = settings.baseUrl + 'sights';
+            el = $$('#sights-list');
+            break;
+        case "/places/":
+            url = settings.baseUrl + 'places';
+            el = $$('#places-list');
+            break;
+        default:
+            log.debug("Default");
+    }
+
     axios.get(url)
         .then(function (response) {
-            var context = {
+            context = {
                 data: fixData(response.data)
             };
             var html = compiledListTemplate(context);
-            $$('#beaches-list').html(html);
+            el.html(html);
         })
         .catch(function (error) {
             console.log(error);
         });
+
+
+}
+
+$$(document).on('page:init', '.page[data-name="places"]', function (e) {
+    log.debug("Init places");
+
+    setTemplate(true);
 });
+
+$$(document).on('page:init', '.page[data-name="beaches"]', function (e) {
+    log.debug("Init beaches");
+
+    setTemplate(true);
+
+});
+
+
 
 $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
     log.debug("init sights");
 
-    url = settings.baseUrl + 'sights';
-    axios.get(url)
+    setTemplate(true);
+
+});
+
+$$(document).on('page:mounted', '.page[data-name="sights"]', function (e) {
+    log.debug("mounted sights");
+
+    $$('.sort-by-distance').on('click', function (e) {
+        console.log('clicked');
+    });
+});
+
+
+$$(document).on('page:init', '.page[data-name="near"]', function (e) {
+    log.debug("init near");
+
+    url = settings.baseUrl + 'nearby';
+    axios.get(url, {
+        params: {
+            lat: "37.444650",
+            lng: "24.940424"
+        }
+    })
         .then(function (response) {
             var context = {
                 data: fixData(response.data)
             };
-            var html = compiledListTemplate(context);
-            $$('#sights-list').html(html);
+            log.debug(context);
+            var html = compiledNearbyListTemplate(context);
+            $$('#nearby-list').html(html);
         })
         .catch(function (error) {
             console.log(error);
@@ -436,6 +486,7 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
     log.debug('Inside details template');
     var page = e.detail;
     var url = settings.baseUrl + 'items/' + page.route.params.id;
+
 
     // Request data for one item
     axios.get(url)
@@ -675,7 +726,7 @@ function fixData(data) {
         if (arrayItem.likes === null) {
             arrayItem.likes = 0;
         }
-        if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
+        if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb) {
             arrayItem.thumbnail = placeHolderThumb;
         } else if (!arrayItem.thumbnail.startsWith("http")) {
             arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
@@ -713,32 +764,38 @@ function setGalleryData(context) {
 
 
 function createHomeSliders() {
+
+    var fixSliderData = function (data) {
+        log.debug("inside fixSliderData");
+
+        var placeHolderThumb = 'images/thumbs/placeholder.jpg';
+        data.forEach(function (arrayItem) {
+            if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb) {
+                arrayItem.thumbnail = placeHolderThumb;
+            } else if (!arrayItem.thumbnail.startsWith("http")) {
+                arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
+            }
+        });
+        log.debug(data);
+        return data;
+    };
+
     //var url = settings.baseUrl + 'all';
-    var urlNearby = "http://travel-guide.lrn.gr/api/public/index.php/all?limit=6&offset=0";
+    var urlNearby = "http://travel-guide.lrn.gr/api/public/index.php/nearby?limit=10&offset=0&order=desc&lat=37.444650&lng=24.940424";
     axios({
         method: 'get',
         url: urlNearby,
     })
         .then(function (response) {
-            log.debug(response.data);
-            var data = response.data;
-            var placeHolderThumb = 'images/thumbs/placeholder.jpg';
-            data.forEach(function (arrayItem) {
-                if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
-                    arrayItem.thumbnail = placeHolderThumb;
-                } else if (!arrayItem.thumbnail.startsWith("http")) {
-                    arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
-                }
-            });
 
-            log.debug(data);
+            var data = fixSliderData(response.data);
 
             var context = {
                 data: data
             };
 
             var html = compiledHomeNearbyTemplate(context);
-            log.debug(compiledHomeNearbyTemplate(context));
+
             $$('#home-nearby').html(html);
 
             var mySwiper = app.swiper.get('#home-nearby-swiper');
@@ -754,23 +811,15 @@ function createHomeSliders() {
         url: urlPopular,
     })
         .then(function (response) {
-            log.debug(response.data);
-            var data = response.data;
-            var placeHolderThumb = 'images/thumbs/placeholder.jpg';
-            data.forEach(function (arrayItem) {
-                if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb ) {
-                    arrayItem.thumbnail = placeHolderThumb;
-                } else if (!arrayItem.thumbnail.startsWith("http")) {
-                    arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
-                }
-            });
+
+            var data = fixSliderData(response.data);
 
             var context = {
                 data: data
             };
 
             var html = compiledHomePopularTemplate(context);
-            log.debug(compiledHomePopularTemplate(context));
+
             $$('#home-popular').html(html);
 
             var mySwiper = app.swiper.get('#home-popular-swiper');
@@ -782,21 +831,24 @@ function createHomeSliders() {
 
     // Favorites Swipper
     var favoritesData = JSON.parse(localStorage.getItem('appFavorites'));
+
+    var data = fixSliderData(favoritesData.favorites.slice(0, 6));
+
     var favoritesContex = {
-        data: favoritesData.favorites.slice(0, 6)
+        data: data
     };
 
     log.debug(favoritesContex);
 
     // Put a timeout for template to be ready
-    setTimeout(function(){
+    setTimeout(function () {
         var favoritesHtml = compiledHomeFavoritesTemplate(favoritesContex);
         $$('#home-favorites').html(favoritesHtml);
         var myFavoritesSwiper = app.swiper.get('#home-favorites-swiper');
         myFavoritesSwiper.update();
-        }, 1000);
+    }, 1000);
 
     //log.debug(compiledHomeFavoritesTemplate(context));
-    
+
 
 }
