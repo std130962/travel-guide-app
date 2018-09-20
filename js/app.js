@@ -41,8 +41,8 @@ log.setLevel(settings.mode);
 
 var appData = {};
 var appCoords = {
-    lat: 37.441811,
-    lng: 24.940424
+    lat: 37.444650,
+    lng: 24.942922
 };
 var appFavorites = {
     favorites: [],
@@ -347,7 +347,6 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e) {
 });
 
 
-
 $$(document).on('page:init', '.page[data-name="info"]', function (e) {
     log.debug("Init info");
 
@@ -369,9 +368,16 @@ var context = {};
 
 
 function setTemplate(order) {
-    log.debug("inside setTemplates")
+    log.debug("inside setTemplates");
 
     var url, el;
+    var params = {};
+
+    if (order === "popularity") {
+        params.order = "desc";
+        params.orderby = "popularity";
+    }
+
 
     switch (app.views.main.router.currentRoute.url) {
         case "/beaches/":
@@ -390,7 +396,9 @@ function setTemplate(order) {
             log.debug("Default");
     }
 
-    axios.get(url)
+    axios.get(url, {
+        params: params
+    })
         .then(function (response) {
             context = {
                 data: fixData(response.data)
@@ -419,11 +427,10 @@ $$(document).on('page:init', '.page[data-name="beaches"]', function (e) {
 });
 
 
-
 $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
     log.debug("init sights");
 
-    setTemplate(true);
+    setTemplate("popularity");
 
 });
 
@@ -442,8 +449,8 @@ $$(document).on('page:init', '.page[data-name="near"]', function (e) {
     url = settings.baseUrl + 'nearby';
     axios.get(url, {
         params: {
-            lat: "37.444650",
-            lng: "24.940424"
+            lat: appGeoData.latitude,
+            lng: appGeoData.longitude
         }
     })
         .then(function (response) {
@@ -463,7 +470,8 @@ $$(document).on('page:init', '.page[data-name="favorites"]', function (e) {
     log.debug("Init favorites");
 
     var context = {
-        data: fixData(appFavorites.favorites)
+        data: fixFavoritesData(appFavorites.favorites)
+        //data: appFavorites.favorites
     };
 
     var html = compiledListTemplate(context);
@@ -489,7 +497,12 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
 
 
     // Request data for one item
-    axios.get(url)
+    axios.get(url, {
+        params: {
+            lat: appGeoData.latitude,
+            lng: appGeoData.longitude
+        }
+    })
         .then(function (response) {
             log.debug(response.data);
 
@@ -504,7 +517,8 @@ $$(document).on('page:init', '.page[data-name="details-template"]', function (e)
             }
 
             // set the distance
-            context.distance = distance(context.lat, context.lng, appCoords.lat, appCoords.lng);
+            context.distance = distance(context.lat, context.lng, appGeoData.latitude, appGeoData.longitude);
+            //context.distance = fixDistance
 
             var html = compiledDetailsTemplate(context);
             $$('#details-div').html(html);
@@ -632,8 +646,6 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
 });
 
 
-
-
 function putDeviceData() {
 
     $$('#device-cordova').text(deviceData.cordova);
@@ -696,6 +708,7 @@ function registerDevice() {
 
 
 function distance(lat1, lon1, lat2, lon2) {
+    log.debug(lat1 + " " + lon1   + " " +  lat2  + " " +  lon2);
     var p = 0.017453292519943295;    // Math.PI / 180
     var c = Math.cos;
     var a = 0.5 - c((lat2 - lat1) * p) / 2 +
@@ -703,11 +716,19 @@ function distance(lat1, lon1, lat2, lon2) {
         (1 - c((lon2 - lon1) * p)) / 2;
 
     var result = 12742 * Math.asin(Math.sqrt(a)); // 2 * R; R = 6371 km
-
+    log.debug(result);
     if (result > 1.5) {
         return Math.round(result * 100) / 100 + " km";
     } else {
         return Math.round(result * 1000) + " m";
+    }
+}
+
+function fixDistance(distance) {
+    if (distance > 1500 ) {
+        return Math.round( distance / 1000 ) + " km";
+    } else {
+        return distance + " m";
     }
 }
 
@@ -716,7 +737,37 @@ function fixData(data) {
     data.forEach(function (arrayItem) {
 
         if (arrayItem.lat) {
-            arrayItem.distance = distance(arrayItem.lat, arrayItem.lng, appCoords.lat, appCoords.lng);
+            arrayItem.distance = fixDistance(arrayItem.distance);
+        } else {
+            arrayItem.distance = "";
+        }
+        var placeHolder = 'images/placeholder.png';
+        var placeHolderThumb = 'images/thumbs/placeholder.jpg';
+
+        if (arrayItem.likes === null) {
+            arrayItem.likes = 0;
+        }
+        if (arrayItem.thumbnail === "" || arrayItem.thumbnail === placeHolderThumb) {
+            arrayItem.thumbnail = placeHolderThumb;
+        } else if (!arrayItem.thumbnail.startsWith("http")) {
+            arrayItem.thumbnail = settings.imagesUrl + 'thumbs/' + arrayItem.thumbnail;
+        }
+        if (arrayItem.image === "" || arrayItem.image === placeHolder) {
+            arrayItem.image = placeHolder;
+        } else if (!arrayItem.image.startsWith("http")) {
+            arrayItem.image = settings.imagesUrl + arrayItem.image;
+        }
+    });
+    log.debug(data);
+
+    return data;
+}
+function fixFavoritesData(data) {
+
+    data.forEach(function (arrayItem) {
+
+        if (arrayItem.lat) {
+            //arrayItem.distance = fixDistance(arrayItem.distance);
         } else {
             arrayItem.distance = "";
         }
@@ -780,11 +831,12 @@ function createHomeSliders() {
         return data;
     };
 
-    //var url = settings.baseUrl + 'all';
-    var urlNearby = "http://travel-guide.lrn.gr/api/public/index.php/nearby?limit=10&offset=0&order=desc&lat=37.444650&lng=24.940424";
-    axios({
-        method: 'get',
-        url: urlNearby,
+    var url = settings.baseUrl + 'nearby';
+    axios.get(url, {
+        params: {
+            lat: appGeoData.latitude,
+            lng: appGeoData.longitude
+        }
     })
         .then(function (response) {
 
@@ -805,7 +857,7 @@ function createHomeSliders() {
             log.debug(error);
         });
 
-    var urlPopular = "http://travel-guide.lrn.gr/api/public/index.php/all?limit=6&offset=0";
+    var urlPopular = "http://travel-guide.lrn.gr/api/public/index.php/items?limit=6&offset=0";
     axios({
         method: 'get',
         url: urlPopular,
