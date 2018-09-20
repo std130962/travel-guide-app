@@ -367,16 +367,40 @@ $$(document).on('page:init', '.page[data-name="info"]', function (e) {
 var context = {};
 
 
-function setTemplate(order) {
+function setTemplate(orderby) {
     log.debug("inside setTemplates");
 
     var url, el;
-    var params = {};
 
-    if (order === "popularity") {
-        params.order = "desc";
-        params.orderby = "popularity";
+    var params = {
+        lat: appGeoData.latitude,
+        lng: appGeoData.longitude,
+        orderby: orderby
+    };
+
+
+    if (context.orderby === orderby) {
+
+        if (context.order === "desc") {
+            params.order = "asc";
+            context.order = "asc";
+        } else {
+            params.order = "desc";
+            context.order = "desc";
+        }
+    } else {
+        context.orderby = orderby;
+        if (context.orderby === "popularity") {
+            // The default order for popularity is desc
+            context.order = "desc";
+            params.order = "desc";
+        } else {
+            context.order = "asc";
+            params.order = "asc";
+        }
+
     }
+
 
 
     switch (app.views.main.router.currentRoute.url) {
@@ -400,9 +424,8 @@ function setTemplate(order) {
         params: params
     })
         .then(function (response) {
-            context = {
-                data: fixData(response.data)
-            };
+            context.data = fixData(response.data);
+
             var html = compiledListTemplate(context);
             el.html(html);
         })
@@ -437,9 +460,7 @@ $$(document).on('page:init', '.page[data-name="sights"]', function (e) {
 $$(document).on('page:mounted', '.page[data-name="sights"]', function (e) {
     log.debug("mounted sights");
 
-    $$('.sort-by-distance').on('click', function (e) {
-        console.log('clicked');
-    });
+
 });
 
 
@@ -645,6 +666,19 @@ $$(document).on('page:init', '.page[data-name="debug"]', function (e) {
 
 });
 
+$$('.sort-by-distance').on('click', function (e) {
+    setTemplate("distance");
+    app.popover.close('.sort-popover', true)
+});
+$$('.sort-by-popularity').on('click', function (e) {
+    setTemplate("popularity");
+    app.popover.close('.sort-popover', true)
+});
+$$('.sort-by-alphabetically').on('click', function (e) {
+    setTemplate("alphabetically");
+    app.popover.close('.sort-popover', true)
+});
+
 
 function putDeviceData() {
 
@@ -831,36 +865,19 @@ function createHomeSliders() {
         return data;
     };
 
-    var url = settings.baseUrl + 'nearby';
-    axios.get(url, {
-        params: {
-            lat: appGeoData.latitude,
-            lng: appGeoData.longitude
-        }
-    })
-        .then(function (response) {
-
-            var data = fixSliderData(response.data);
-
-            var context = {
-                data: data
-            };
-
-            var html = compiledHomeNearbyTemplate(context);
-
-            $$('#home-nearby').html(html);
-
-            var mySwiper = app.swiper.get('#home-nearby-swiper');
-            mySwiper.update();
-        })
-        .catch(function (error) {
-            log.debug(error);
-        });
-
-    var urlPopular = "http://travel-guide.lrn.gr/api/public/index.php/items?limit=6&offset=0";
+    // Popular places
+    var urlPopular = settings.baseUrl + 'items';
+    //"http://travel-guide.lrn.gr/api/public/index.php/items?limit=6&offset=0";
     axios({
         method: 'get',
         url: urlPopular,
+        params: {
+            lat: appGeoData.latitude,
+            lng: appGeoData.longitude,
+            order: "desc",
+            orderby: "popularity",
+            limit: 8
+        }
     })
         .then(function (response) {
 
@@ -884,7 +901,7 @@ function createHomeSliders() {
     // Favorites Swipper
     var favoritesData = JSON.parse(localStorage.getItem('appFavorites'));
 
-    var data = fixSliderData(favoritesData.favorites.slice(0, 6));
+    var data = fixSliderData(favoritesData.favorites.slice(0, 8));
 
     var favoritesContex = {
         data: data
@@ -900,7 +917,35 @@ function createHomeSliders() {
         myFavoritesSwiper.update();
     }, 1000);
 
-    //log.debug(compiledHomeFavoritesTemplate(context));
+    // Nearby places
+    var url = settings.baseUrl + 'all';
+    axios.get(url, {
+        params: {
+            lat: appGeoData.latitude,
+            lng: appGeoData.longitude,
+            order: "asc",
+            orderby: "distance",
+            limit: 8
+        }
+    })
+        .then(function (response) {
+
+            var data = fixSliderData(response.data);
+
+            var context = {
+                data: data
+            };
+
+            var html = compiledHomeNearbyTemplate(context);
+
+            $$('#home-nearby').html(html);
+
+            var mySwiper = app.swiper.get('#home-nearby-swiper');
+            mySwiper.update();
+        })
+        .catch(function (error) {
+            log.debug(error);
+        });
 
 
 }
