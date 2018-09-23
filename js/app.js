@@ -235,17 +235,7 @@ function checkApp() {
         initApp(true);
     }
 
-    // Check geolocation
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, {
-            maximumAge: 5000,
-            timeout: 15000,
-            enableHighAccuracy: true
-        });
-    } else {
-        // for browsers that dont support geolocation
-
-    }
+   setGeolocation();
 
     // Check favorites on localStorage
     if (localStorage.appFavorites) {
@@ -258,6 +248,20 @@ function checkApp() {
     }
 
     showHomeComponents();
+}
+
+function setGeolocation() {
+    // Check geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, {
+            maximumAge: 5000,
+            timeout: 15000,
+            enableHighAccuracy: true
+        });
+    } else {
+        // for browsers that dont support geolocation
+
+    }
 }
 
 
@@ -362,6 +366,7 @@ $$(document).on('page:init', '.page[data-name="info"]', function (e) {
         .catch(function (error) {
             console.log(error);
         });
+    setGeolocation();
 });
 
 var context = {};
@@ -691,6 +696,26 @@ function putDeviceData() {
     $$('#device-isvirtual').text(deviceData.isVirtual);
     $$('#device-serial').text(deviceData.serial);
 
+    // Geolacation Data
+    $$('#geolocation-latitude').text(appGeoData.latitude);
+    $$('#geolocation-longitude').text(appGeoData.longitude);
+    $$('#geolocation-altitude').text(appGeoData.altitude);
+    $$('#geolocation-accuracy').text(appGeoData.accuracy);
+
+    $$('#geolocation-timestamp').text(appGeoData.timestamp);
+ /*
+    appGeoData.latitude = settings.coords.lat;
+    appGeoData.longitude = settings.coords.lng;
+    appGeoData.altitude = '';
+    appGeoData.accuracy = '';
+    appGeoData.altitudeAccuracy = '';
+    appGeoData.heading = '';
+    appGeoData.speed = '';
+    appGeoData.timestamp = '';
+    appGeodata.success = false;
+
+*/
+
 }
 
 // Create guid
@@ -796,6 +821,7 @@ function fixData(data) {
 
     return data;
 }
+
 function fixFavoritesData(data) {
 
     data.forEach(function (arrayItem) {
