@@ -40,14 +40,14 @@ var settings = {
 log.setLevel(settings.mode);
 
 var appData = {};
-var appCoords = {
-    lat: 37.444650,
-    lng: 24.942922
-};
+
 var appFavorites = {
     favorites: [],
     ids: []
 };
+
+var appSettings = {};
+
 var appGeoData = {};
 
 // Initialize deviceData with defaults data in case the app run from browser (Debugging mode)
@@ -99,19 +99,7 @@ var onGeolocationError = function (error) {
         appGeoData = JSON.parse(localStorage.getItem('appGeoData'));
         appGeoData.success = false;
     } else {
-        //No appGeoData on localStorage and geolocation fail
-        //Use defaults lng lat from settings
-        appGeoData.latitude = settings.coords.lat;
-        appGeoData.longitude = settings.coords.lng;
-        appGeoData.altitude = '';
-        appGeoData.accuracy = '';
-        appGeoData.altitudeAccuracy = '';
-        appGeoData.heading = '';
-        appGeoData.speed = '';
-        appGeoData.timestamp = '';
-        appGeodata.success = false;
-
-        localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
+        defaultGeoData();
     }
 
     if (settings.mode === 'debug') {
@@ -127,6 +115,20 @@ var onGeolocationError = function (error) {
     }
 
 };
+
+function defaultGeoData() {
+    appGeoData.latitude = settings.coords.lat;
+    appGeoData.longitude = settings.coords.lng;
+    appGeoData.altitude = '';
+    appGeoData.accuracy = '';
+    appGeoData.altitudeAccuracy = '';
+    appGeoData.heading = '';
+    appGeoData.speed = '';
+    appGeoData.timestamp = '';
+    appGeoData.success = false;
+
+    localStorage.setItem('appGeoData', JSON.stringify(appGeoData));
+}
 
 
 if (app.device.cordova) {
@@ -223,6 +225,16 @@ function setDeviceData() {
 function checkApp() {
     log.debug('Inside checkApp');
 
+    if (localStorage.appSettings) {
+        log.debug('localstorage have appSettings');
+        appSettings = JSON.parse(localStorage.getItem('appSettings'));
+    } else {
+        // Set defaults
+        appSettings.sendGeoData = true;
+        appSettings.storeGeoData = true;
+        localStorage.setItem('appSettings', JSON.stringify(appSettings));
+    }
+
     if (localStorage.appData) {
         log.debug('localstorage have appData');
         appData = JSON.parse(localStorage.getItem('appData'));
@@ -235,7 +247,7 @@ function checkApp() {
         initApp(true);
     }
 
-   setGeolocation();
+    setGeolocation();
 
     // Check favorites on localStorage
     if (localStorage.appFavorites) {
@@ -252,15 +264,16 @@ function checkApp() {
 
 function setGeolocation() {
     // Check geolocation
-    if (navigator.geolocation) {
+    log.debug('Inside setGeolocation');
+    if (navigator.geolocation && appSettings.sendGeoData) {
         navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError, {
             maximumAge: 5000,
             timeout: 15000,
             enableHighAccuracy: true
         });
     } else {
-        // for browsers that dont support geolocation
-
+        // for browsers that dont support geolocation or if user settings dont allow sending data
+        defaultGeoData();
     }
 }
 
@@ -276,6 +289,10 @@ function initApp(firstTime) {
         log.debug('Init app for first time');
         appData.guid = createGuid();
         appData.authHeader = "Basic " + btoa(appData.guid);
+
+        appGeoData.send = true;
+        appGeoData.store = true;
+
         registerDevice();
     }
 
@@ -407,7 +424,6 @@ function setTemplate(orderby) {
     }
 
 
-
     switch (app.views.main.router.currentRoute.url) {
         case "/beaches/":
             url = settings.baseUrl + 'beaches';
@@ -514,6 +530,55 @@ $$(document).on('page:init', '.page[data-name="details"]', function (e) {
         .catch(function (error) {
             log.error(error);
         });
+});
+
+$$(document).on('page:init', '.page[data-name="settings"]', function () {
+    log.debug("Init settings");
+
+    var storeSetting = app.toggle.create({
+        el: '.storeSetting',
+        on: {
+            change: function () {
+
+                if (this.checked) {
+                    console.log('Toggle checked');
+                } else {
+                    console.log('Toggle unchecked');
+                }
+            }
+        }
+    })
+
+    var sendSetting = app.toggle.create({
+        el: '.sendSetting',
+        on: {
+            change: function () {
+                if (this.checked) {
+                    console.log('Toggle checked');
+                } else {
+                    console.log('Toggle unchecked');
+
+                }
+            }
+        }
+    });
+
+    sendSetting.on('change', function (e) {
+        if (storeSetting.checked) {
+            storeSetting.checked = false;
+        }
+    });
+
+    // var storeSetting = app.toggle.get('.storeSetting');
+    // var sendSetting = app.toggle.get('.sendSetting');
+
+    // storeSetting.toggle();
+
+    if (sendSetting.checked) {
+        // do something
+        log.debug("Init settings");
+    }
+
 });
 
 $$(document).on('page:init', '.page[data-name="details-template"]', function (e) {
@@ -703,18 +768,18 @@ function putDeviceData() {
     $$('#geolocation-accuracy').text(appGeoData.accuracy);
 
     $$('#geolocation-timestamp').text(appGeoData.timestamp);
- /*
-    appGeoData.latitude = settings.coords.lat;
-    appGeoData.longitude = settings.coords.lng;
-    appGeoData.altitude = '';
-    appGeoData.accuracy = '';
-    appGeoData.altitudeAccuracy = '';
-    appGeoData.heading = '';
-    appGeoData.speed = '';
-    appGeoData.timestamp = '';
-    appGeodata.success = false;
+    /*
+       appGeoData.latitude = settings.coords.lat;
+       appGeoData.longitude = settings.coords.lng;
+       appGeoData.altitude = '';
+       appGeoData.accuracy = '';
+       appGeoData.altitudeAccuracy = '';
+       appGeoData.heading = '';
+       appGeoData.speed = '';
+       appGeoData.timestamp = '';
+       appGeodata.success = false;
 
-*/
+   */
 
 }
 
@@ -767,7 +832,7 @@ function registerDevice() {
 
 
 function distance(lat1, lon1, lat2, lon2) {
-    log.debug(lat1 + " " + lon1   + " " +  lat2  + " " +  lon2);
+    log.debug(lat1 + " " + lon1 + " " + lat2 + " " + lon2);
     var p = 0.017453292519943295;    // Math.PI / 180
     var c = Math.cos;
     var a = 0.5 - c((lat2 - lat1) * p) / 2 +
@@ -784,8 +849,8 @@ function distance(lat1, lon1, lat2, lon2) {
 }
 
 function fixDistance(distance) {
-    if (distance > 1500 ) {
-        return Math.round( distance / 1000 ) + " km";
+    if (distance > 1500) {
+        return Math.round(distance / 1000) + " km";
     } else {
         return distance + " m";
     }
